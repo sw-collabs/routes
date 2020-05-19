@@ -6,7 +6,10 @@ export function __ns(elem, config={}, ...children) {
   });
 
   if (children) {
-    children.forEach(child => elem.appendChild(child));
+    children.forEach(child => {
+      console.log(typeof child === 'Node');
+      elem.appendChild(child);
+    });
   }
 
   return elem;
@@ -60,12 +63,7 @@ export function line(vecf, vect, config={}) {
 
 export function g(id, ...children) {
   const g = document.createElementNS(SVG_NS, 'g');
-  g.setAttribute('id', id);
-
-  if (children) {
-    children.forEach(c => g.appendChild(c));
-  }
-  return g;
+  return __ns(g, {'id' : id}, ...children);
 }
 
 export function text(vec, words, config={}) {
