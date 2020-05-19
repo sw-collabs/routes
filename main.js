@@ -1,4 +1,4 @@
-import {__ns, circle, vec} from "./lib.js";
+import {__ns, circle, vec, line} from "./lib.js";
 
 const ID_SVG = 'main-svg';
 
@@ -12,12 +12,13 @@ const initGrid = () => {
   const {width, height} = SVG.getBoundingClientRect();
 
   // Draw vertical lines every GRID_SIZE pixels
+  let elems = [];
   let i;
   for (i=0; i < width; i+=GRID_SIZE) {
-    SVG.appendChild
+    elems.push(line(vec(i, 0), vec(i, height)), {});
   }
 
-
+  __ns(SVG, {}, ...elems);
 };
 
 (() => {
