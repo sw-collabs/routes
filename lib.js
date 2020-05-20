@@ -7,7 +7,6 @@ export function __ns(elem, config={}, ...children) {
 
   if (children) {
     children.forEach(child => {
-      console.log(typeof child === 'Node');
       elem.appendChild(child);
     });
   }
