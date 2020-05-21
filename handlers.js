@@ -13,3 +13,8 @@ export function onPathClick() {
 export function onDoneClick() {
   alert('Done click!');
 }
+
+export const Path = {
+  mousemove() { },
+  mousedown() { }
+};
