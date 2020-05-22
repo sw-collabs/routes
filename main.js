@@ -30,12 +30,22 @@ const SVGEvents = {
         circle(pt, 2, {
           'fill': 'black'
         }));
-    }
+    },
+    handlers.Section.mousedown,
+    handlers.StoreShelf.mousedown,
+    handlers.mousedown
   ],
   'mousemove': [
-    handlers.Path.mousemove
+    handlers.Path.mousemove,
+    handlers.Section.mousemove,
+    handlers.StoreShelf.mousemove
+  ],
+  'mouseup': [
+    handlers.Section.mouseup,
+    handlers.StoreShelf.mouseup,
+    handlers.mouseup
   ]
-}
+};
 
 
 /* Add import from this module to HTML file here */
@@ -51,6 +61,14 @@ window.Main = {
 {
   const initSVG = () => {
     let SVG = document.getElementById(ID_SVG);
+
+    /*
+     * Create a group for each element type:
+     * Section, Store/Shelf, Path
+     */
+    __ns(SVG, {}, g('sections'));
+    __ns(SVG, {}, g('store-shelf'));
+    __ns(SVG, {}, g('paths'));
 
     /*
      * Adds all event handlers defined from SVGEvents

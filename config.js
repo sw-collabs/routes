@@ -4,3 +4,13 @@ export const GRID_CLR = '#dbdbdb';
 export const GRID_SIZE = 20;
 export const GRID_LINE_CONFIG = {'stroke-width': 0.5, 'stroke' : GRID_CLR};
 
+/* Section config */
+export const SECTION_CONFIG = {
+  'fill-opacity': 0,
+  'stroke-width': 2,
+  'stroke': 'black'
+};
+
+export const STORE_SHELF_CONFIG = {
+  'fill': '#3c7eb5',
+};
