@@ -1,6 +1,6 @@
 import {clientToSnapCoords} from './lib.js';
 import {ID_SVG, SECTION_CONFIG, STORE_SHELF_CONFIG} from './config.js';
-import {__ns, vec, rect} from './gl.js';
+import {__ns, vec, rect, update} from './gl.js';
 
 const SECTION = 'section';
 const STORE_SHELF = 'store-shelf';
@@ -125,12 +125,12 @@ const updateRectangleEvt = (evt) => {
   const y = startPos.y > pt.y ? pt.y : startPos.y;
 
   /* Update the element attributes */
-  currentElement.setAttribute('x', x);
-  currentElement.setAttribute('y', y);
-  currentElement.setAttribute('width',
-    Math.abs(pt.x - startPos.x));
-  currentElement.setAttribute('height',
-    Math.abs(pt.y - startPos.y));
+  update(currentElement, {
+    'x': x,
+    'y': y,
+    'width': Math.abs(pt.x - startPos.x),
+    'height': Math.abs(pt.y - startPos.y)
+  });
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -91,4 +91,11 @@ export function text(vec, words, config={}) {
   });
 }
 
+export function update(elem, config) {
+  for (let [k, v] of Object.entries(config)) {
+    elem.setAttribute(k, v);
+  }
+  return elem;
+};
+
 
