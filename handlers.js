@@ -65,7 +65,7 @@ export const Section = {
 export const StoreShelf = {
   mousedown: (evt) => storeShelfMouseDown(evt),
   mousemove: (evt) => storeShelfMouseMove(evt),
-  mouseup: (evt) => storeShelfMouseMove(evt)
+  mouseup: (evt) => storeShelfMouseUp(evt)
 };
 
 ///////////////////////////////////////////////////////
@@ -182,7 +182,7 @@ const storeShelfMouseMove = (evt) => {
 };
 
 const storeShelfMouseUp = (evt) => {
-  if (elementType != STORE_SHELF)
+  if (elementType !== STORE_SHELF)
     return;
   currentElement = null;
 };
