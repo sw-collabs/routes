@@ -60,6 +60,17 @@ export function line(vecf, vect, config={}) {
   });
 }
 
+export function rect(vecf, w, h, config={}) {
+  const r = document.createElementNS(SVG_NS, 'rect');
+  return __ns(r, {
+    ...config,
+    x: vecf.x,
+    y: vecf.y,
+    width: w,
+    height: h
+  });
+}
+
 export function g(id, ...children) {
   const g = document.createElementNS(SVG_NS, 'g');
   return __ns(g, {'id' : id}, ...children);
