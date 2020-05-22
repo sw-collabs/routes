@@ -1,9 +1,16 @@
 import {clientToSnapCoords} from './lib.js';
-import {ID_SVG, SECTION_CONFIG, STORE_SHELF_CONFIG} from './config.js';
-import {__ns, vec, rect, update} from './gl.js';
+import {
+  ID_SVG,
+  STYLE_SECTION,
+  STYLE_STORE_SHELF,
+  STYLE_PATH
+} from './config.js';
+import {__ns, vec, rect, line, update, ASSERT_VEC} from './gl.js';
 
 const SECTION = 'section';
 const STORE_SHELF = 'store-shelf';
+const PATH = 'path';
+
 
 /* The current element being edited/rendered by the user */
 let currentElement = null;
@@ -13,6 +20,9 @@ let mouseUp = 1;
 
 /* Position of mouse down event */
 let startPos = vec(null, null);
+let currPos = vec(null, null);
+let bool_first_initialized = false;
+let int_pathUUID = 0;
 
 let elementType = null;
 
@@ -28,9 +38,12 @@ export function mousedown(evt) {
 
 export function mouseup(evt) {
   if (evt.button === 0) {
-
     mouseUp = 1;
   }
+}
+
+export function mousemove(evt) {
+  currPos = clientToSnapCoords(vec(evt.clientX, evt.clientY));
 }
 
 export function onSectionClick() {
@@ -45,6 +58,7 @@ export function onStoreShelfClick() {
 
 export function onPathClick() {
   alert('Path click!');
+  elementType = PATH;
 }
 
 export function onDoneClick() {
@@ -52,8 +66,9 @@ export function onDoneClick() {
 }
 
 export const Path = {
-  mousemove() { },
-  mousedown() {  }
+  mousemove: (evt) => pathMouseMove(evt),
+  mousedown: (evt) => pathMouseDown(evt),
+  mouseup: (evt) => pathMouseUp(evt)
 };
 
 export const Section = {
@@ -143,7 +158,7 @@ const sectionMouseDown = (evt) => {
     vec(evt.clientX, evt.clientY)
   );
 
-  createRectangleEvt(startPos, SECTION_CONFIG);
+  createRectangleEvt(startPos, STYLE_SECTION);
 };
 
 const sectionMouseMove = (evt) => {
@@ -158,6 +173,7 @@ const sectionMouseUp = (evt) => {
     return;
 
   currentElement = null;
+  startPos = vec(null, null);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -170,7 +186,7 @@ const storeShelfMouseDown = (evt) => {
     vec(evt.clientX, evt.clientY)
   );
 
-  createRectangleEvt(startPos, STORE_SHELF_CONFIG);
+  createRectangleEvt(startPos, STYLE_STORE_SHELF);
 };
 
 const storeShelfMouseMove = (evt) => {
@@ -185,4 +201,52 @@ const storeShelfMouseUp = (evt) => {
   if (elementType !== STORE_SHELF)
     return;
   currentElement = null;
+  startPos = vec(null, null);
+};
+
+////////////////////////////////////////////////////////////////////////
+////////// PATH EVENT HANDLERS
+const pathMouseDown = (evt) => {
+  if (elementType !== PATH) {
+    return;
+  }
+
+  bool_first_initialized = true;
+  startPos = vec(currPos.x, currPos.y);
+};
+
+const pathMouseMove = (evt) => {
+  if (elementType !== PATH || !ASSERT_VEC(startPos)) {
+    return;
+  }
+
+  const SVG = document.getElementById(ID_SVG);
+  const ID_STR = 'path';
+
+  // First time
+  if (bool_first_initialized) {
+    // create this element
+    let _line = line(startPos, currPos, {
+      id: `${ID_STR}-${++int_pathUUID}`,
+      ...STYLE_PATH
+    });
+    __ns(SVG, {}, _line );
+    bool_first_initialized = false;
+  } else {
+    const currLine = document.getElementById(`${ID_STR}-${int_pathUUID}`);
+    __ns(currLine, {
+      x2: currPos.x,
+      y2: currPos.y
+    });
+  }
+};
+
+const pathMouseUp = (evt) => {
+  if (elementType !== PATH) {
+    return;
+  }
+
+  currentElement = null;
+  startPos = vec(null, null);
+  bool_first_initialized = false;
 };

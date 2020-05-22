@@ -1,3 +1,4 @@
+import {vec} from "./gl.js";
 import {GRID_SIZE, ID_SVG} from "./config.js";
 
 /*
@@ -8,10 +9,8 @@ import {GRID_SIZE, ID_SVG} from "./config.js";
 export function clientToSVGCoords(client) {
   let SVG = document.getElementById(ID_SVG);
   let {left, top} = SVG.getBoundingClientRect();
-  return {
-    x: client.x - left,
-    y: client.y - top
-  };
+
+  return vec(client.x - left, client.y - top);
 }
 
 /*

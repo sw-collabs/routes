@@ -1,5 +1,7 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+export const ASSERT_VEC = v => v !== null && v.x !== null && v.y !== null;
+
 export function __ns(elem, config={}, ...children) {
   Object.keys(config).forEach(k => {
     elem.setAttribute(k, config[k])

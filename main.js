@@ -38,9 +38,11 @@ const SVGEvents = {
   'mousemove': [
     handlers.Path.mousemove,
     handlers.Section.mousemove,
-    handlers.StoreShelf.mousemove
+    handlers.StoreShelf.mousemove,
+    handlers.mousemove
   ],
   'mouseup': [
+    handlers.Path.mouseup,
     handlers.Section.mouseup,
     handlers.StoreShelf.mouseup,
     handlers.mouseup
