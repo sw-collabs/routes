@@ -14,23 +14,23 @@ const ButtonEvents = {
 const SVGEvents = {
   'mousedown': [
     handlers.Path.mousedown,
-  /*
-   * Test if snap to grid works
-   */
-  (evt) => {
-    let SVG = document.getElementById(ID_SVG);
+    /*
+     * Test if snap to grid works
+     */
+    (evt) => {
+      let SVG = document.getElementById(ID_SVG);
 
-    let {left, top} = SVG.getBoundingClientRect();
-    let x = evt.clientX - left;
-    let y = evt.clientY - top;
+      let {left, top} = SVG.getBoundingClientRect();
+      let x = evt.clientX - left;
+      let y = evt.clientY - top;
 
-    let pt = snapToGrid(x, y);
-    __ns(SVG,
-      {},
-      circle(pt, 2, {
-        'fill': 'black'
-      }));
-  }
+      let pt = snapToGrid(x, y);
+      __ns(SVG,
+        {},
+        circle(pt, 2, {
+          'fill': 'black'
+        }));
+    }
   ],
   'mousemove': [
     handlers.Path.mousemove
