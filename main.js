@@ -13,7 +13,7 @@ const ButtonEvents = {
 };
 const SVGEvents = {
   'mousedown': [
-    handlers.Path.mousedown,
+    handlers.PathHandlers.mousedown,
     /*
      * Test if snap to grid works
      */
@@ -31,20 +31,20 @@ const SVGEvents = {
           'fill': 'black'
         }));
     },
-    handlers.Section.mousedown,
-    handlers.StoreShelf.mousedown,
+    handlers.SectionHandlers.mousedown,
+    handlers.StoreShelfHandlers.mousedown,
     handlers.mousedown
   ],
   'mousemove': [
-    handlers.Path.mousemove,
-    handlers.Section.mousemove,
-    handlers.StoreShelf.mousemove,
+    handlers.PathHandlers.mousemove,
+    handlers.SectionHandlers.mousemove,
+    handlers.StoreShelfHandlers.mousemove,
     handlers.mousemove
   ],
   'mouseup': [
-    handlers.Path.mouseup,
-    handlers.Section.mouseup,
-    handlers.StoreShelf.mouseup,
+    handlers.PathHandlers.mouseup,
+    handlers.SectionHandlers.mouseup,
+    handlers.StoreShelfHandlers.mouseup,
     handlers.mouseup
   ]
 };
