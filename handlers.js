@@ -47,17 +47,14 @@ export function mousemove(evt) {
 }
 
 export function onSectionClick() {
-  alert('Section click!');
   elementType = SECTION;
 }
 
 export function onStoreShelfClick() {
-  alert('Store shelf click!');
   elementType = STORE_SHELF;
 }
 
 export function onPathClick() {
-  alert('Path click!');
   elementType = PATH;
 }
 
@@ -99,6 +96,8 @@ export const StoreShelf = {
  *
  * @param pos
  * @param config
+ * @param w
+ * @param h
  */
 const createRectangleEvt = (pos, config, w=5, h=5) => {
   let SVG = document.getElementById(ID_SVG);
@@ -194,7 +193,6 @@ const storeShelfMouseMove = (evt) => {
     return;
 
   updateRectangleEvt(evt);
-
 };
 
 const storeShelfMouseUp = (evt) => {

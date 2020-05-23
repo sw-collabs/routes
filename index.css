@@ -3,3 +3,12 @@
   height: auto;
 }
 
+.element-form {
+  background-color: black;
+  z-index: 10;
+}
+
+#main-svg {
+  position: absolute;
+  z-index: -1;
+}
