@@ -3,6 +3,11 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 export const ASSERT_VEC = v => v !== null && v.x !== null && v.y !== null;
 export const DISTANCE = v => Math.sqrt(v.x*v.x + v.y*v.y);
 export const NORMALIZE = v => vec(v.x/DISTANCE(v), v.y/DISTANCE(v));
+export const SUB = (v1, v2) => vec(v1.x-v2.x, v1.y-v2.y);
+export const ADD = (v1, v2) => vec(v1.x+v2.x, v1.y+v2.y);
+export const SCALAR_MULT = (s, v) => vec(s*v.x, s*v.y);
+export const EQUALS = (v1, v2) => v1.x === v2.x && v1.y === v2.y;
+export const LEQUALS = (v1, v2) => v1.x <= v2.x && v1.y <= v2.y;
 
 export function mat2(a11, a12, a21, a22) {
   /*
@@ -22,6 +27,27 @@ export function det(mat2) {
   return a11 * a22 - a12 * a21;
 }
 
+export function cross3(vec3_a, vec3_b) {
+  console.assert(vec3_a.z !== null);
+  console.assert(vec3_b.z !== null);
+
+  let a1, a2, a3;
+  let b1, b2, b3;
+
+  a1 = vec3_a.x;
+  a2 = vec3_a.y;
+  a3 = vec3_a.z;
+  b1 = vec3_b.x;
+  b2 = vec3_b.y;
+  b3 = vec3_b.z;
+
+  return vec3(
+    a2 * b3 - a3 * b2,
+    a3 * b1 - a1 * b3,
+    a1 * b2 - a2 * b1
+  );
+}
+
 export function __ns(elem, config={}, ...children) {
   Object.keys(config).forEach(k => {
     elem.setAttribute(k, config[k])
@@ -38,6 +64,10 @@ export function __ns(elem, config={}, ...children) {
 
 export function vec(x, y) {
   return {x, y};
+}
+
+export function vec3(x, y, z) {
+  return {x, y, z};
 }
 
 export function circle(vec, r, config={}) {

@@ -118,6 +118,10 @@ export function rayBoxIntersection(linePFrom,
       (tymin < 0.0 && tymax < 0.0)) {
     return false;
   }
-  return !(txmin > tymax || tymin > txmax);
+
+  return {
+    intersects: !(txmin > tymax || tymin > txmax),
+    t: Math.min(txmin, tymin)
+  };
 }
 

@@ -1,11 +1,22 @@
-import {clientToSnapCoords} from './lib.js';
+import StoreShelf from "./StoreShelf.js";
+import BaseObject from "./BaseObject.js";
+import Path from "./BaseObject.js";
+import { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
+
+import {
+  clientToSnapCoords,
+  lineLineIntersection,
+  rayBoxIntersection,
+  snapToGrid
+} from './lib.js';
 import {
   ID_SVG,
   STYLE_SECTION,
   STYLE_STORE_SHELF,
   STYLE_PATH
 } from './config.js';
-import {__ns, vec, rect, line, update, ASSERT_VEC} from './gl.js';
+import {__ns, vec, vec3, cross3, rect, line, update, ASSERT_VEC} from './gl.js';
+import * as gl from './gl.js';
 
 const SECTION = 'section';
 const STORE_SHELF = 'store-shelf';
@@ -25,6 +36,12 @@ let bool_first_initialized = false;
 let int_pathUUID = 0;
 
 let elementType = null;
+
+/* Put all objects here */
+let PATHS = {};
+let STORE_SHELVES = {};
+let SECTIONS = {};
+
 
 /////////////////////////////////////////////////////////////
 /*
@@ -62,19 +79,19 @@ export function onDoneClick() {
   alert('Done click!');
 }
 
-export const Path = {
+export const PathHandlers = {
   mousemove: (evt) => pathMouseMove(evt),
   mousedown: (evt) => pathMouseDown(evt),
   mouseup: (evt) => pathMouseUp(evt)
 };
 
-export const Section = {
+export const SectionHandlers = {
   mousedown: (evt) => sectionMouseDown(evt),
   mousemove: (evt) => sectionMouseMove(evt),
   mouseup: (evt) => sectionMouseUp(evt)
 };
 
-export const StoreShelf = {
+export const StoreShelfHandlers = {
   mousedown: (evt) => storeShelfMouseDown(evt),
   mousemove: (evt) => storeShelfMouseMove(evt),
   mouseup: (evt) => storeShelfMouseUp(evt)
@@ -219,19 +236,19 @@ const pathMouseMove = (evt) => {
   }
 
   const SVG = document.getElementById(ID_SVG);
-  const ID_STR = 'path';
 
   // First time
   if (bool_first_initialized) {
     // create this element
     let _line = line(startPos, currPos, {
-      id: `${ID_STR}-${++int_pathUUID}`,
+      id: `${ObjectSVGConfigs.PATH_ID}-${++int_pathUUID}`,
       ...STYLE_PATH
     });
     __ns(SVG, {}, _line );
     bool_first_initialized = false;
   } else {
-    const currLine = document.getElementById(`${ID_STR}-${int_pathUUID}`);
+    const currLine = document.getElementById(
+      `${ObjectSVGConfigs.PATH_ID}-${int_pathUUID}`);
     __ns(currLine, {
       x2: currPos.x,
       y2: currPos.y
@@ -244,6 +261,8 @@ const pathMouseUp = (evt) => {
     return;
   }
 
+  let id = `${ObjectSVGConfigs.PATH_ID}-${int_pathUUID}`;
+  PATHS[id] = new Path(id, startPos, currPos);
   currentElement = null;
   startPos = vec(null, null);
   bool_first_initialized = false;
