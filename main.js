@@ -13,9 +13,9 @@ const ButtonEvents = {
 };
 const SVGEvents = {
   'mousedown': [
-    handlers.Path.mousedown,
-    handlers.Section.mousedown,
-    handlers.StoreShelf.mousedown,
+    handlers.PathHandlers.mousedown,
+    handlers.SectionHandlers.mousedown,
+    handlers.StoreShelfHandlers.mousedown,
     handlers.mousedown
   ],
   'mousemove': [
