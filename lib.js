@@ -1,4 +1,4 @@
-import {vec} from "./gl.js";
+import {vec, det, mat2, NORMALIZE} from "./gl.js";
 import {GRID_SIZE, ID_SVG} from "./config.js";
 
 /*
@@ -37,3 +37,87 @@ export function snapToGrid(x, y) {
     y: Math.min(GRID_SIZE * Math.round(y / GRID_SIZE), height)
   };
 }
+
+export function lineLineIntersection(line1PFrom,
+                                     line1PTo,
+                                     line2PFrom,
+                                     line2PTo) {
+  let x1, x2, x3, x4;
+  let y1, y2, y3, y4;
+
+  x1 = line1PFrom.x;
+  x2 = line1PTo.x;
+  x3 = line2PFrom.x;
+  x4 = line2PTo.x;
+  y1 = line1PFrom.y;
+  y2 = line1PTo.y;
+  y3 = line2PFrom.y;
+  y4 = line2PTo.y;
+
+  let t, u;
+  let denom = det(mat2(x1-x2, x3-x4, y1-y2, y3-y4));
+  t = det(mat2(x1-x3, x3-x4, y1-y3, y3-y4)) / denom;
+  u = det(mat2(x1-x2, x1-x3, y1-y2, y1-y3)) / denom;
+
+  if ((t >= 0.0 && t <= 1.0) || (u >= 0.0 && u <= 1.0)) {
+    return vec(
+      x1 + t * (x2 - x1),
+      y1 + t * (y2-y1)
+    );
+  }
+
+  return null;
+}
+
+/*
+ * A ray is different from a line in that it shoots off
+ * to infinity whereas a line ends.
+ */
+export function rayBoxIntersection(linePFrom,
+                                   lineDirVec,
+                                   rectPTopLeft,
+                                   rectPBotRight) {
+  let xmin, xmax, ymin, ymax;
+
+  xmin = rectPTopLeft.x;
+  xmax = rectPBotRight.x;
+  ymin = rectPBotRight.y;
+  ymax = rectPTopLeft.y;
+
+  let xd, yd;
+  let d = NORMALIZE(lineDirVec);
+  xd = d.x;
+  yd = d.y;
+
+  let txmin, txmax, tymin, tymax;
+  let xa = 1/xd;
+  if (xa >= 0) {
+    txmin = xa * (xmin-linePFrom.x);
+    txmax = xa * (xmax-linePFrom.x);
+  } else {
+    txmin = xa * (xmax-linePFrom.x);
+    txmax = xa * (xmin-linePFrom.x);
+  }
+
+  let ya = 1/yd;
+  if (ya >= 0) {
+    tymin = ya * (ymin-linePFrom.y);
+    tymax = ya * (ymax-linePFrom.y);
+  } else {
+    tymin = ya * (ymax-linePFrom.y);
+    tymax = ya * (ymin-linePFrom.y);
+  }
+
+  /*
+   * This ray is not infinite on both ends - meaning
+   * if the ray only intersects with the box in the
+   * opposite direction to its heading, then return
+   * false.
+   */
+  if ((txmin < 0.0 && txmax < 0.0) ||
+      (tymin < 0.0 && tymax < 0.0)) {
+    return false;
+  }
+  return !(txmin > tymax || tymin > txmax);
+}
+

@@ -1,6 +1,26 @@
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export const ASSERT_VEC = v => v !== null && v.x !== null && v.y !== null;
+export const DISTANCE = v => Math.sqrt(v.x*v.x + v.y*v.y);
+export const NORMALIZE = v => vec(v.x/DISTANCE(v), v.y/DISTANCE(v));
+
+export function mat2(a11, a12, a21, a22) {
+  /*
+   | a11 a12 |
+   | a21 a22 |
+   */
+  return {
+    a11,
+    a12,
+    a21,
+    a22
+  };
+}
+
+export function det(mat2) {
+  const {a11, a12, a21, a22} = mat2;
+  return a11 * a22 - a12 * a21;
+}
 
 export function __ns(elem, config={}, ...children) {
   Object.keys(config).forEach(k => {
