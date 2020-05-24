@@ -2,6 +2,8 @@ const SVG_NS = 'http://www.w3.org/2000/svg';
 
 export const ASSERT_VEC = v => v !== null && v.x !== null && v.y !== null;
 export const DISTANCE = v => Math.sqrt(v.x*v.x + v.y*v.y);
+export const ABS = v => vec(Math.abs(v.x), Math.abs(v.y));
+export const SQR_DIST = v => v.x * v.x + v.y * v.y;
 export const NORMALIZE = v => vec(v.x/DISTANCE(v), v.y/DISTANCE(v));
 export const SUB = (v1, v2) => vec(v1.x-v2.x, v1.y-v2.y);
 export const ADD = (v1, v2) => vec(v1.x+v2.x, v1.y+v2.y);

@@ -328,9 +328,10 @@ const pathMouseMove = (evt) => {
     currentElement = line(startPos, currPos, STYLE_PATH);
     __ns(document.getElementById(ID_SVG), {}, currentElement);
   } else {
+    let delta = gl.ABS(gl.SUB(currPos, startPos));
     __ns(currentElement, {
-      x2: currPos.x,
-      y2: currPos.y
+      x2: delta.x > delta.y ? currPos.x : startPos.x,
+      y2: delta.y > delta.x ? currPos.y : startPos.y
     })
   }
 };
@@ -341,7 +342,17 @@ const pathMouseUp = (evt) => {
   }
 
   document.getElementById(ID_SVG).removeChild(currentElement);
-  const NewPath = new Path(startPos, currPos);
+  const NewPath = new Path(
+    vec(
+      currentElement.getAttribute('x1'),
+      currentElement.getAttribute('y1')
+    ),
+    vec(
+      currentElement.getAttribute('x2'),
+      currentElement.getAttribute('y2')
+    )
+  );
+  console.log(NewPath);
   upsertIntersection(NewPath.from, NewPath);
   upsertIntersection(NewPath.to, NewPath);
 
@@ -419,7 +430,6 @@ const pathMouseUp = (evt) => {
     PATHS[path.id] = path;
   })
 
-  console.log(INTERSECTIONS, PATHS);
   currentElement = null;
   startPos = vec(null, null);
 };

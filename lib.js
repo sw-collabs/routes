@@ -1,5 +1,6 @@
 import {vec, det, mat2, NORMALIZE} from "./gl.js";
 import {GRID_SIZE, ID_SVG} from "./config.js";
+import * as gl from "./gl.js";
 
 /*
  * Converts client mouse position to
@@ -67,10 +68,27 @@ export function lineLineIntersection(line1PFrom,
   u = det(mat2(x1-x2, x1-x3, y1-y2, y1-y3)) / denom;
 
   if ((t >= 0.0 && t <= 1.0) || (u >= 0.0 && u <= 1.0)) {
-    return vec(
+    let point = vec(
       x1 + t * (x2 - x1),
       y1 + t * (y2-y1)
     );
+
+    let lenL1, lenL2;
+    lenL1 = gl.SQR_DIST(gl.SUB(line1PTo, line1PFrom));
+    lenL2 = gl.SQR_DIST(gl.SUB(line2PTo, line2PFrom));
+
+    let lenPL1 = Math.max(
+      gl.SQR_DIST(gl.SUB(line1PTo, point)),
+      gl.SQR_DIST(gl.SUB(line1PFrom, point))
+    );
+    let lenPL2 = Math.max(
+      gl.SQR_DIST(gl.SUB(line2PTo, point)),
+      gl.SQR_DIST(gl.SUB(line2PFrom, point))
+    );
+
+    return lenPL1 <= lenL1 && lenPL2 <= lenL2
+      ? point
+      : null;
   }
 
   return null;
