@@ -29,8 +29,8 @@ export const STYLE_STORE_SHELF_TEXT = {
 };
 
 export const STYLE_PATH = {
-  'stroke': 'red',
-  'stroke-width': 2
+  'stroke': '#75968e',
+  'stroke-width': 4
 };
 
 export const STYLE_INTERSECTION = {

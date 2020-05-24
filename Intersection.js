@@ -1,10 +1,11 @@
 import BaseObject, {ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
-import { __ns, circle } from "./gl.js";
+import { __ns, rect, vec } from "./gl.js";
+import * as gl from "./gl.js";
 import { svgCoordsToGridCoords } from "./lib.js";
 import { INTERSECTIONS } from "./handlers.js";
 import { ID_INTERSECTION_G, STYLE_INTERSECTION } from "./config.js";
 
-const CIRCLE_R = 2; // pixels
+const SYMBOL_WIDTH_HEIGHT = 5;
 const INTERSECTION_ID = coords => `${ObjectSVGConfigs.INTERSECTION_ID}-${coords.x}-${coords.y}`;
 
 export function getIntersection(point) {
@@ -70,10 +71,14 @@ export default class Intersection extends BaseObject {
     // Render this on SVG
     const INTERSECTION_G = document.getElementById(ID_INTERSECTION_G);
     __ns(INTERSECTION_G, {},
-      circle(this.point, CIRCLE_R, {
+      rect(
+        gl.SUB(this.point, vec(SYMBOL_WIDTH_HEIGHT/2, SYMBOL_WIDTH_HEIGHT/2)),
+        SYMBOL_WIDTH_HEIGHT,
+        SYMBOL_WIDTH_HEIGHT, {
         id: this.id,
-        ...STYLE_INTERSECTION
-      })
+          ...STYLE_INTERSECTION
+        }
+      )
     );
   }
 
