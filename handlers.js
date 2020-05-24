@@ -162,6 +162,7 @@ export const StoreShelfHandlers = {
 const toggleElementForm = (show) => {
   let form = document.getElementById(ID_ELEMENT_FORM);
   form.style.display = show ? 'block' : 'none';
+  document.getElementById('element-name').focus();
   processingElemInfo = show;
 };
 
