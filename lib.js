@@ -23,6 +23,13 @@ export function clientToSnapCoords(client) {
   return snapToGrid(svgPos.x, svgPos.y);
 }
 
+export function svgCoordsToGridCoords(svgCoords) {
+  return vec(
+    Math.floor(svgCoords.x / GRID_SIZE),
+    Math.floor(svgCoords.y / GRID_SIZE)
+  );
+}
+
 /*
  * Snaps the given position to a point
  * on the grid.

@@ -8,6 +8,7 @@ export const ADD = (v1, v2) => vec(v1.x+v2.x, v1.y+v2.y);
 export const SCALAR_MULT = (s, v) => vec(s*v.x, s*v.y);
 export const EQUALS = (v1, v2) => v1.x === v2.x && v1.y === v2.y;
 export const LEQUALS = (v1, v2) => v1.x <= v2.x && v1.y <= v2.y;
+export const VEC_STR = v => `${v.x}-${v.y}`;
 
 export function mat2(a11, a12, a21, a22) {
   /*

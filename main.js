@@ -1,10 +1,11 @@
-import {__ns, circle, vec, line, g} from "./gl.js";
+import {__ns, circle, vec, text, line, g} from "./gl.js";
 import * as handlers from "./handlers.js";
 import {
   ID_SVG,
   ID_STORE_SHELVES_G,
   ID_PATH_G,
   ID_SECTION_G,
+  ID_INTERSECTION_G,
   GRID_LINE_CONFIG,
   GRID_SIZE
 } from "./config.js";
@@ -74,8 +75,7 @@ window.Main = {
     __ns(SVG, {}, g(ID_SECTION_G));
     __ns(SVG, {}, g(ID_STORE_SHELVES_G));
     __ns(SVG, {}, g(ID_PATH_G));
-
-
+    __ns(SVG, {}, g(ID_INTERSECTION_G));
   };
 
   /* Initialize grid on svg canvas */
@@ -86,21 +86,35 @@ window.Main = {
     // Draw vertical lines every GRID_SIZE pixels
     let elems = [];
     {
+      let ind = 0;
       let i;
-      for (i = 0; i < width; i += GRID_SIZE) {
+      for (i = 0; i < width; i += GRID_SIZE, ind++) {
         elems.push(
           line(vec(i, 0), vec(i, height), GRID_LINE_CONFIG)
         );
+        elems.push(
+          text(vec(i, 13), `${ind}`, {
+            'stroke': 'black',
+            'font-size': '10'
+          })
+        )
       }
     }
 
     // Horizontal lines
     {
+      let ind = 0;
       let i;
-      for (i = 0; i < height; i += GRID_SIZE) {
+      for (i = 0; i < height; i += GRID_SIZE, ind++) {
         elems.push(
           line(vec(0, i), vec(width, i), GRID_LINE_CONFIG)
         );
+        elems.push(
+          text(vec(5, i+5), `${ind}`, {
+            'stroke': 'black',
+            'font-size': '10'
+          })
+        )
       }
     }
 

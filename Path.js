@@ -1,18 +1,36 @@
 import * as gl from "./gl.js";
+import { __ns, g, line, circle } from "./gl.js";
 import BaseObject from "./BaseObject.js";
-import { ObjectTypes} from "./BaseObject.js";
-import {lineLineIntersection, rayBoxIntersection, snapToGrid} from "./lib.js";
+import { ID_PATH_G, STYLE_PATH } from "./config.js";
+import { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
+import {lineLineIntersection, rayBoxIntersection, snapToGrid, svgCoordsToGridCoords} from "./lib.js";
 import {cross3, vec, vec3} from "./gl.js";
 import { STORE_SHELVES } from "./handlers.js";
 
+const PATH_ID = (fromGrids, toGrids) => `${ObjectSVGConfigs.PATH_ID}-${gl.VEC_STR(fromGrids)}-${gl.VEC_STR(toGrids)}`;
 
 export default class Path extends BaseObject {
-  constructor(id, from, to) {
+  constructor(from, to) {
+    let id = PATH_ID(svgCoordsToGridCoords(from), svgCoordsToGridCoords(to));
+
     super(id, ObjectTypes.PATH);
     this.from = from;
     this.to = to;
     this.unitVec = gl.NORMALIZE(gl.SUB(to, from));
     this.adjStoreShelves = [];
+
+    this.idLine = `${id}-line`;
+
+    // Render element on SVG
+    const PATH_G = document.getElementById(ID_PATH_G);
+    __ns(PATH_G, {},
+      g(id,
+        line(from, to, {
+          ...STYLE_PATH,
+          id: this.idLine
+        })
+      )
+    );
   }
 
   lineIntersection(path) {
@@ -89,9 +107,7 @@ export default class Path extends BaseObject {
       do {
         // p = p + 0.3*u
         p = gl.ADD(p, gl.SCALAR_MULT(0.3, this.unitVec));
-        newGrid = snapToGrid(p.x, p.y);
-      } while (gl.EQUALS(newGrid, currGrid));
-      currGrid = newGrid;
+        newGrid = snapToGrid(p.x, p.y); } while (gl.EQUALS(newGrid, currGrid)); currGrid = newGrid;
     }
   }
 
@@ -101,11 +117,47 @@ export default class Path extends BaseObject {
    *
    * Note: after this function, Path should no longer
    * be used.
+   * Note: Edge case where atPoint is either 'this.from' or
+   * 'this.to' - in this case, do nothing.
    */
   cut(atPoint) {
-    return {
-      first: new Path(this.from, atPoint),
-      second: new Path(atPoint, this.to)
-    };
+    let segments = [];
+    if (!gl.EQUALS(atPoint, this.from) && !gl.EQUALS(atPoint, this.to)) {
+      segments.push({
+        from: this.from,
+        to: atPoint
+      });
+
+      segments.push({
+        from: atPoint,
+        to: this.to
+      });
+    }
+
+    return segments;
+  }
+
+  update(from, to) {
+    if (gl.EQUALS(this.from, from) && gl.EQUALS(this.to, to)) {
+      return;
+    }
+
+    this.from = from;
+    this.to = to;
+
+    let lineSVG = document.getElementById(this.idLine);
+    __ns(lineSVG, {
+      x1: from.x,
+      y1: from.y,
+      x2: to.x,
+      y2: to.y
+    });
+  }
+
+  undraw() {
+    let lineSVG = document.getElementById(ID_PATH_G);
+    lineSVG.removeChild(
+      document.getElementById(this.id)
+    );
   }
 }

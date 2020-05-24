@@ -15,5 +15,6 @@ export const ObjectTypes = {
 export const ObjectSVGConfigs = {
   PATH_ID: 'path',
   SECTION_ID: 'section',
-  STORE_SHELF_ID: 'store-shelf'
+  STORE_SHELF_ID: 'store-shelf',
+  INTERSECTION_ID: 'intersection'
 };

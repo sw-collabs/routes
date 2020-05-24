@@ -1,11 +1,17 @@
 import StoreShelf from "./StoreShelf.js";
 import BaseObject from "./BaseObject.js";
 import Section from "./Section.js";
-import Path from "./BaseObject.js";
+import Intersection, {
+  getIntersection,
+  upsertIntersection,
+  removeFromIntersection
+} from "./Intersection.js";
+import Path from "./Path.js";
 import { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
 
 import {
   clientToSnapCoords,
+  svgCoordsToGridCoords,
   lineLineIntersection,
   rayBoxIntersection,
   snapToGrid,
@@ -42,6 +48,7 @@ let processingElemInfo = false;
 /* Position of mouse down event */
 let startPos = vec(null, null);
 let currPos = vec(null, null);
+let currGridCoords = vec(null, null);
 let bool_first_initialized = false;
 let int_pathUUID = 0;
 let int_sectionUUID = 0;
@@ -74,6 +81,7 @@ export function mouseup(evt) {
 
 export function mousemove(evt) {
   currPos = clientToSnapCoords(vec(evt.clientX, evt.clientY));
+  currGridCoords = svgCoordsToGridCoords(currPos);
 }
 
 export function onSectionClick() {
@@ -261,6 +269,7 @@ const sectionMouseUp = (evt) => {
 
   toggleElementForm(true);
 
+  currentElement = null;
   startPos = vec(null, null);
 };
 
@@ -296,6 +305,7 @@ const storeShelfMouseUp = (evt) => {
 
   toggleElementForm(true);
 
+  currentElement = null;
   startPos = vec(null, null);
 };
 
@@ -306,7 +316,6 @@ const pathMouseDown = (evt) => {
     return;
   }
 
-  bool_first_initialized = true;
   startPos = vec(currPos.x, currPos.y);
 };
 
@@ -315,24 +324,14 @@ const pathMouseMove = (evt) => {
     return;
   }
 
-  const SVG = document.getElementById(ID_SVG);
-
-  // First time
-  if (bool_first_initialized) {
-    // create this element
-    let _line = line(startPos, currPos, {
-      id: `${ObjectSVGConfigs.PATH_ID}-${++int_pathUUID}`,
-      ...STYLE_PATH
-    });
-    __ns(SVG, {}, _line );
-    bool_first_initialized = false;
+  if (currentElement === null) {
+    currentElement = line(startPos, currPos, STYLE_PATH);
+    __ns(document.getElementById(ID_SVG), {}, currentElement);
   } else {
-    const currLine = document.getElementById(
-      `${ObjectSVGConfigs.PATH_ID}-${int_pathUUID}`);
-    __ns(currLine, {
+    __ns(currentElement, {
       x2: currPos.x,
       y2: currPos.y
-    });
+    })
   }
 };
 
@@ -341,9 +340,86 @@ const pathMouseUp = (evt) => {
     return;
   }
 
-  let id = `${ObjectSVGConfigs.PATH_ID}-${int_pathUUID}`;
-  PATHS[id] = new Path(id, startPos, currPos);
+  document.getElementById(ID_SVG).removeChild(currentElement);
+  const NewPath = new Path(startPos, currPos);
+  upsertIntersection(NewPath.from, NewPath);
+  upsertIntersection(NewPath.to, NewPath);
+
+  /*
+   * If current path intersects with any paths, break them
+   * apart. Since all lines are guaranteed to be straight,
+   * lines can intersect at most once.
+   *
+   * Approach:
+   * For each path in PATHS, check if current path intersects
+   * with it. If intersects:
+   * (1) Cut current path into 2 segments at the intersection
+   *     point
+   * (2) Cut other path into 2 segments at the intersection
+   *     point
+   * (3) Discard paths which were cut
+   * (4) Create new intersection (if not exists)
+   *
+   * Note: define 'other' as the path which intersects with
+   * the main (or current) path.
+   */
+  let currPathSegments = { [NewPath.id]: NewPath };
+  let otherPathSegments = [];
+
+  Object.values(PATHS).forEach(path => {
+    Object.values(currPathSegments).forEach(currPath => {
+      let atPoint = currPath.lineIntersection(path);
+      if (atPoint !== null) {
+        // intersects at 'atPoint'
+        let currSegments = currPath.cut(atPoint);
+        let otherSegments = path.cut(atPoint);
+
+        // Initialize cut segments for main path
+        if (currSegments.length > 0) {
+          removeFromIntersection(currPath.from, currPath);
+          removeFromIntersection(currPath.to, currPath);
+          currPath.undraw();
+          delete currPathSegments[currPath.id];
+
+          // Create new paths
+          currSegments.forEach(({from, to}) => {
+            let newCurrPath = new Path(from, to);
+            currPathSegments[newCurrPath.id] = newCurrPath;
+
+            upsertIntersection(newCurrPath.from, newCurrPath);
+            upsertIntersection(newCurrPath.to, newCurrPath);
+          });
+        }
+
+        // Initialize cut segments for 'other' path
+        if (otherSegments.length > 0) {
+          removeFromIntersection(path.from, currPath);
+          removeFromIntersection(path.to, currPath);
+          path.undraw();
+          delete PATHS[path.id];
+
+          // Create new paths
+          otherSegments.forEach(({from, to}) => {
+            let newOtherPath = new Path(from, to);
+            otherPathSegments.push(newOtherPath);
+
+            upsertIntersection(newOtherPath.from, newOtherPath);
+            upsertIntersection(newOtherPath.to, newOtherPath);
+          });
+        }
+      }
+    });
+  });
+
+  // Finally, commit path
+  Object.values(currPathSegments).forEach(path => {
+    PATHS[path.id] = path;
+  });
+  otherPathSegments.forEach(path => {
+    PATHS[path.id] = path;
+  })
+
+  console.log(INTERSECTIONS, PATHS);
   currentElement = null;
   startPos = vec(null, null);
-  bool_first_initialized = false;
 };
