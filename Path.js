@@ -1,7 +1,7 @@
 import * as gl from "./gl.js";
 import { __ns, g, line, circle } from "./gl.js";
 import BaseObject from "./BaseObject.js";
-import { ID_PATH_G, STYLE_PATH } from "./config.js";
+import { ID_PATH_G, STYLE_PATH, GRID_SIZE } from "./config.js";
 import { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
 import {lineLineIntersection, rayBoxIntersection, snapToGrid, svgCoordsToGridCoords} from "./lib.js";
 import {cross3, vec, vec3} from "./gl.js";
@@ -17,7 +17,7 @@ export default class Path extends BaseObject {
     this.from = from;
     this.to = to;
     this.unitVec = gl.NORMALIZE(gl.SUB(to, from));
-    this.adjStoreShelves = [];
+    this.adjStoreShelves = {};
 
     this.idLine = `${id}-line`;
 
@@ -55,7 +55,7 @@ export default class Path extends BaseObject {
    *     'this.to'
    */
   updateAdjacency() {
-    const T_MAX = 5.0;
+    const T_MAX = 2 * GRID_SIZE;
     this.adjStoreShelves = {};
 
     /*
@@ -89,25 +89,51 @@ export default class Path extends BaseObject {
       );
 
       if (intersects &&
-        t <= T_MAX &&
-        !this.adjStoreShelves.hasOwnProperty(box.id)
+          t <= T_MAX &&
+          !this.adjStoreShelves.hasOwnProperty(box.id)
       ) {
-        this.adjStoreShelves[box.id] = box;
+        return t;
       }
+
+      return null;
     };
 
     let currGrid = this.from;
-    while (gl.LEQUALS(currGrid, this.to)) {
+    while (!gl.EQUALS(currGrid, this.to)) {
+      let tminFront = Infinity;
+      let tminBack = Infinity;
+      let minFront = null
+      let minBack = null;
       Object.values(STORE_SHELVES).forEach(box => {
-        intersect(front, box);
-        intersect(back, box);
+        if (!this.adjStoreShelves.hasOwnProperty(box.id)) {
+          let tFront = intersect(front, box);
+          let tBack = intersect(back, box);
+
+          if (tFront !== null && tFront < tminFront) {
+            tminFront = tFront;
+            minFront = box;
+          } else if (tBack !== null && tBack < tminBack) {
+            tminBack = tBack;
+            minBack = box;
+          }
+        }
       });
+
+      if (minFront !== null) {
+        this.adjStoreShelves[minFront.id] = minFront;
+      }
+      if (minBack !== null) {
+        this.adjStoreShelves[minBack.id] = minBack;
+      }
 
       let newGrid, p = currGrid;
       do {
         // p = p + 0.3*u
         p = gl.ADD(p, gl.SCALAR_MULT(0.3, this.unitVec));
-        newGrid = snapToGrid(p.x, p.y); } while (gl.EQUALS(newGrid, currGrid)); currGrid = newGrid;
+        newGrid = snapToGrid(p.x, p.y);
+      } while (gl.EQUALS(newGrid, currGrid));
+
+      currGrid = newGrid;
     }
   }
 

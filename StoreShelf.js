@@ -1,4 +1,5 @@
 import BaseObject from "./BaseObject.js";
+import { vec } from "./gl.js"
 import { ObjectTypes } from "./BaseObject.js"
 
 export default class StoreShelf extends BaseObject {
@@ -12,5 +13,19 @@ export default class StoreShelf extends BaseObject {
 
     /* The section that this object is stored in */
     this.parentSection = null;
+  }
+
+  center() {
+    let xmin, xmax, ymin, ymax;
+
+    xmin = this.topLeft.x;
+    xmax = this.botRight.x;
+    ymin = this.topLeft.y;
+    ymax = this.botRight.y;
+
+    return vec(
+      xmin + (xmax - xmin) / 2,
+      ymin + (ymax - ymin) / 2
+    )
   }
 }

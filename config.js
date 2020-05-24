@@ -3,6 +3,7 @@ export const ID_ELEMENT_FORM = 'element-form';
 export const ID_SECTION_G = 'sections';
 export const ID_INTERSECTION_G = 'intersections';
 export const ID_PATH_G = 'paths';
+export const ID_DISPLAY_LAYER_G = 'display-layer';
 export const ID_STORE_SHELVES_G = 'store-shelves';
 
 export const GRID_CLR = '#dbdbdb';
@@ -35,4 +36,9 @@ export const STYLE_PATH = {
 
 export const STYLE_INTERSECTION = {
   'fill': 'black'
+};
+
+export const STYLE_ADJ_DISPLAY = {
+  'stroke': '#e66960',
+  'stroke-width': 1
 };

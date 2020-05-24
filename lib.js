@@ -107,8 +107,8 @@ export function rayBoxIntersection(linePFrom,
 
   xmin = rectPTopLeft.x;
   xmax = rectPBotRight.x;
-  ymin = rectPBotRight.y;
-  ymax = rectPTopLeft.y;
+  ymin = rectPTopLeft.y;
+  ymax = rectPBotRight.y;
 
   let xd, yd;
   let d = NORMALIZE(lineDirVec);
@@ -118,20 +118,56 @@ export function rayBoxIntersection(linePFrom,
   let txmin, txmax, tymin, tymax;
   let xa = 1/xd;
   if (xa >= 0) {
-    txmin = xa * (xmin-linePFrom.x);
-    txmax = xa * (xmax-linePFrom.x);
+    if (xa === Infinity) {
+      txmin = (xmin-linePFrom.x) !== 0
+        ? xa * (xmin-linePFrom.x)
+        : 0;
+      txmax = (xmax-linePFrom.x) !== 0
+        ? xa * (xmax-linePFrom.x)
+        : 0;
+    } else {
+      txmin = xa * (xmin - linePFrom.x);
+      txmax = xa * (xmax - linePFrom.x);
+    }
   } else {
-    txmin = xa * (xmax-linePFrom.x);
-    txmax = xa * (xmin-linePFrom.x);
+    if (xa === -Infinity) {
+      txmin = (xmax-linePFrom.x) !== 0
+        ? xa * (xmax-linePFrom.x)
+        : 0;
+      txmax = (xmin-linePFrom.x) !== 0
+        ? xa * (xmin-linePFrom.x)
+        : 0;
+    } else {
+      txmin = xa * (xmax - linePFrom.x);
+      txmax = xa * (xmin - linePFrom.x);
+    }
   }
 
   let ya = 1/yd;
   if (ya >= 0) {
-    tymin = ya * (ymin-linePFrom.y);
-    tymax = ya * (ymax-linePFrom.y);
+    if (ya === Infinity) {
+      tymin = ymin-linePFrom.y !== 0
+        ? ya * (ymin-linePFrom.y)
+        : 0;
+      tymax = ymax-linePFrom.y !== 0
+        ? ya * (ymax-linePFrom.y)
+        : 0;
+    } else {
+      tymin = ya * (ymin - linePFrom.y);
+      tymax = ya * (ymax - linePFrom.y);
+    }
   } else {
-    tymin = ya * (ymax-linePFrom.y);
-    tymax = ya * (ymin-linePFrom.y);
+    if (ya === -Infinity) {
+      tymin = (ymax-linePFrom.y) !== 0
+        ? ya * (ymax-linePFrom.y)
+        : 0;
+      tymax = (ymin-linePFrom.y) !== 0
+        ? ya * (ymin-linePFrom.y)
+        : 0;
+    } else {
+      tymin = ya * (ymax - linePFrom.y);
+      tymax = ya * (ymin - linePFrom.y);
+    }
   }
 
   /*
@@ -147,7 +183,7 @@ export function rayBoxIntersection(linePFrom,
 
   return {
     intersects: !(txmin > tymax || tymin > txmax),
-    t: Math.min(txmin, tymin)
+    t: Math.abs(Math.max(txmin, tymin))
   };
 }
 

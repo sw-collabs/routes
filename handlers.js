@@ -24,10 +24,12 @@ import {
   ID_SECTION_G,
   ID_PATH_G,
   ID_STORE_SHELVES_G,
+  ID_DISPLAY_LAYER_G,
   STYLE_SECTION,
   STYLE_STORE_SHELF,
   STYLE_PATH,
-  STYLE_STORE_SHELF_TEXT
+  STYLE_STORE_SHELF_TEXT,
+  STYLE_ADJ_DISPLAY
 } from './config.js';
 import {__ns, vec, vec3, cross3, rect, line, update, ASSERT_VEC, text} from './gl.js';
 import * as gl from './gl.js';
@@ -97,7 +99,25 @@ export function onPathClick() {
 }
 
 export function onDoneClick() {
-  alert('Done click!');
+  Object.values(PATHS).forEach(path => {
+    console.assert(path.type === ObjectTypes.PATH);
+    path.updateAdjacency();
+
+    // Highlight all adjacent stores
+    const center = vec(
+      path.from.x + (path.to.x - path.from.x)/2,
+      path.from.y + (path.to.y - path.from.y)/2
+    );
+
+    const DISPLAY_G = document.getElementById(ID_DISPLAY_LAYER_G);
+    Object.values(path.adjStoreShelves).forEach(adj => {
+      if (adj.type === ObjectTypes.STORE_SHELF) {
+        __ns(DISPLAY_G, {},
+          line(center, adj.center(), STYLE_ADJ_DISPLAY)
+        );
+      }
+    });
+  });
 }
 
 /*
@@ -317,6 +337,7 @@ const pathMouseDown = (evt) => {
   }
 
   startPos = vec(currPos.x, currPos.y);
+  currentElement = null;
 };
 
 const pathMouseMove = (evt) => {
@@ -328,6 +349,7 @@ const pathMouseMove = (evt) => {
     currentElement = line(startPos, currPos, STYLE_PATH);
     __ns(document.getElementById(ID_SVG), {}, currentElement);
   } else {
+    // draw only horizontal or vertical lines
     let delta = gl.ABS(gl.SUB(currPos, startPos));
     let isX = delta.x >= delta.y;
     __ns(currentElement, {

@@ -6,6 +6,7 @@ import {
   ID_PATH_G,
   ID_SECTION_G,
   ID_INTERSECTION_G,
+  ID_DISPLAY_LAYER_G,
   GRID_LINE_CONFIG,
   GRID_SIZE
 } from "./config.js";
@@ -76,6 +77,7 @@ window.Main = {
     __ns(SVG, {}, g(ID_STORE_SHELVES_G));
     __ns(SVG, {}, g(ID_PATH_G));
     __ns(SVG, {}, g(ID_INTERSECTION_G));
+    __ns(SVG, {}, g(ID_DISPLAY_LAYER_G));
   };
 
   /* Initialize grid on svg canvas */
