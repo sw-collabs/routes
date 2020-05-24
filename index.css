@@ -4,10 +4,37 @@
 }
 
 .element-form {
-  background-color: black;
+  display: none;
+  background-color: white;
   z-index: 10;
+  color: black;
+  border: 3px solid #f1f1f1;
+  right: 0px;
+  max-width: 300px;
+  padding: 20px;
+  font-family: "Helvetica", sans-serif;
+  position: absolute;
+}
+
+.element-form label {
+  display: block;
+  padding-bottom: 5px;
+}
+
+.element-form input[type=text] {
+  display: block;
+  width: 90%;
+  margin-bottom: 10px;
+  padding: 15px;
+  border: none;
+  background: #f1f1f1;
+}
+
+#element-header {
+  padding-bottom: 0px;
+  margin-bottom: 15px;
 }
 
 #main-svg {
-  position: absolute;
+  /*position: absolute;*/
 }

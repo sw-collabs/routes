@@ -1,4 +1,8 @@
 export const ID_SVG = 'main-svg';
+export const ID_ELEMENT_FORM = 'element-form';
+export const ID_SECTION_G = 'sections';
+export const ID_PATH_G = 'paths';
+export const ID_STORE_SHELVES_G = 'store-shelves';
 
 export const GRID_CLR = '#dbdbdb';
 export const GRID_SIZE = 10;

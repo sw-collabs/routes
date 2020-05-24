@@ -1,7 +1,13 @@
 import {__ns, circle, vec, line, g} from "./gl.js";
 import * as handlers from "./handlers.js";
-import {ID_SVG, GRID_LINE_CONFIG, GRID_SIZE} from "./config.js";
-import {snapToGrid} from "./lib.js"
+import {
+  ID_SVG,
+  ID_STORE_SHELVES_G,
+  ID_PATH_G,
+  ID_SECTION_G,
+  GRID_LINE_CONFIG,
+  GRID_SIZE
+} from "./config.js";
 
 
 /* Button Event Handlers */
@@ -9,7 +15,8 @@ const ButtonEvents = {
   uiHandleSectionClick: () => handlers.onSectionClick(),
   uiHandleStoreShelfClick: () => handlers.onStoreShelfClick(),
   uiHandlePathClick: () => handlers.onPathClick(),
-  uiHandleDoneClick: () => handlers.onDoneClick()
+  uiHandleDoneClick: () => handlers.onDoneClick(),
+  uiHandleInfoSubmit: () => handlers.onInfoSubmit()
 };
 const SVGEvents = {
   'mousedown': [
@@ -48,14 +55,6 @@ window.Main = {
     let SVG = document.getElementById(ID_SVG);
 
     /*
-     * Create a group for each element type:
-     * Section, Store/Shelf, Path
-     */
-    __ns(SVG, {}, g('sections'));
-    __ns(SVG, {}, g('store-shelf'));
-    __ns(SVG, {}, g('paths'));
-
-    /*
      * Adds all event handlers defined from SVGEvents
      */
     for (let [k, v] of Object.entries(SVGEvents)) {
@@ -66,6 +65,15 @@ window.Main = {
     }
 
     initGrid();
+
+    /*
+     * Create a group for each element type:
+     * Section, Store/Shelf, Path
+     */
+    __ns(SVG, {}, g(ID_SECTION_G));
+    __ns(SVG, {}, g(ID_STORE_SHELVES_G));
+    __ns(SVG, {}, g(ID_PATH_G));
+
   };
 
   /* Initialize grid on svg canvas */

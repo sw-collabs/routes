@@ -12,5 +12,7 @@ export const ObjectTypes = {
 };
 
 export const ObjectSVGConfigs = {
-  PATH_ID: 'path'
+  PATH_ID: 'path',
+  SECTION_ID: 'section',
+  STORE_SHELF_ID: 'store-shelf'
 };

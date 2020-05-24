@@ -1,5 +1,6 @@
 import StoreShelf from "./StoreShelf.js";
 import BaseObject from "./BaseObject.js";
+import Section from "./Section.js";
 import Path from "./BaseObject.js";
 import { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
 
@@ -7,10 +8,15 @@ import {
   clientToSnapCoords,
   lineLineIntersection,
   rayBoxIntersection,
-  snapToGrid
+  snapToGrid,
+  getRectCorners
 } from './lib.js';
 import {
   ID_SVG,
+  ID_ELEMENT_FORM,
+  ID_SECTION_G,
+  ID_PATH_G,
+  ID_STORE_SHELVES_G,
   STYLE_SECTION,
   STYLE_STORE_SHELF,
   STYLE_PATH
@@ -34,6 +40,8 @@ let startPos = vec(null, null);
 let currPos = vec(null, null);
 let bool_first_initialized = false;
 let int_pathUUID = 0;
+let int_sectionUUID = 0;
+let int_storeShelfUUID = 0;
 
 let elementType = null;
 
@@ -79,6 +87,42 @@ export function onDoneClick() {
   alert('Done click!');
 }
 
+/*
+ * Handles element info form submission
+ * Should create a new StoreShelf/Section
+ * object based on the newly created element
+ * type.
+ * Assumes that the new element is stored
+ * in the currentElement variable
+ */
+export function onInfoSubmit() {
+  if (currentElement === null)
+    alert('ERROR: current element is NULL!!');
+
+  const name = document.getElementById('element-name').value;
+  const annotations = document.getElementById('annotations').value.split(',');
+
+  let { topLeft, botRight } = getRectCorners(currentElement);
+
+  let id;
+  switch (elementType) {
+    case SECTION:
+      id = `${ObjectSVGConfigs.SECTION_ID}-${int_sectionUUID}`;
+      SECTIONS[id] = new Section(id, topLeft, botRight, name, annotations);
+      break;
+    case STORE_SHELF:
+      id = `${ObjectSVGConfigs.STORE_SHELF_ID}-${int_storeShelfUUID}`;
+      STORE_SHELVES[id] = new StoreShelf(id, topLeft, botRight, name, annotations);
+      break;
+    default:
+      break;
+  }
+
+  toggleElementForm(false);
+
+  return false;
+}
+
 export const PathHandlers = {
   mousemove: (evt) => pathMouseMove(evt),
   mousedown: (evt) => pathMouseDown(evt),
@@ -95,6 +139,13 @@ export const StoreShelfHandlers = {
   mousedown: (evt) => storeShelfMouseDown(evt),
   mousemove: (evt) => storeShelfMouseMove(evt),
   mouseup: (evt) => storeShelfMouseUp(evt)
+};
+
+///////////////////////////////////////////////////////
+///////////////// HELPER FUNCTIONS
+const toggleElementForm = (show) => {
+  let form = document.getElementById(ID_ELEMENT_FORM);
+  form.style.display = show ? 'block' : 'none';
 };
 
 ///////////////////////////////////////////////////////
@@ -116,11 +167,10 @@ export const StoreShelfHandlers = {
  * @param w
  * @param h
  */
-const createRectangleEvt = (pos, config, w=5, h=5) => {
-  let SVG = document.getElementById(ID_SVG);
+const createRectangleEvt = (parent, pos, config, w=5, h=5) => {
   currentElement = rect(pos, w, h, config);
 
-  __ns(SVG, {}, currentElement);
+  __ns(parent, {}, currentElement);
 };
 
 /**
@@ -174,7 +224,12 @@ const sectionMouseDown = (evt) => {
     vec(evt.clientX, evt.clientY)
   );
 
-  createRectangleEvt(startPos, STYLE_SECTION);
+  createRectangleEvt(
+    document.getElementById(ID_SECTION_G),
+    startPos, {
+    ...STYLE_SECTION,
+    id: `${ObjectSVGConfigs.SECTION_ID}-${++int_sectionUUID}`
+  });
 };
 
 const sectionMouseMove = (evt) => {
@@ -188,9 +243,12 @@ const sectionMouseUp = (evt) => {
   if (elementType !== SECTION)
     return;
 
-  currentElement = null;
+  toggleElementForm(true);
+
   startPos = vec(null, null);
+
 };
+
 
 ////////////////////////////////////////////////////////////////////////
 ////////// STORE-SHELF EVENT HANDLERS
@@ -202,7 +260,12 @@ const storeShelfMouseDown = (evt) => {
     vec(evt.clientX, evt.clientY)
   );
 
-  createRectangleEvt(startPos, STYLE_STORE_SHELF);
+  createRectangleEvt(
+    document.getElementById(ID_STORE_SHELVES_G),
+    startPos, {
+    ...STYLE_STORE_SHELF,
+    id: `${ObjectSVGConfigs.STORE_SHELF_ID}-${++int_storeShelfUUID}`
+  });
 };
 
 const storeShelfMouseMove = (evt) => {
@@ -215,7 +278,9 @@ const storeShelfMouseMove = (evt) => {
 const storeShelfMouseUp = (evt) => {
   if (elementType !== STORE_SHELF)
     return;
-  currentElement = null;
+
+  toggleElementForm(true)
+
   startPos = vec(null, null);
 };
 

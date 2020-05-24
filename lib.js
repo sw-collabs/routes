@@ -125,3 +125,23 @@ export function rayBoxIntersection(linePFrom,
   };
 }
 
+/*
+ * Returns the top left and bottom right
+ * corners of the <rect> element
+ */
+export function getRectCorners(rect) {
+
+  let topLeft = vec(
+    parseFloat(rect.getAttribute('x')),
+    parseFloat(rect.getAttribute('y'))
+  );
+
+  let botRight = vec(
+    topLeft.x + parseFloat(rect.getAttribute('width')) - 1,
+    topLeft.y + parseFloat(rect.getAttribute('height')) - 1
+  );
+
+  return { topLeft, botRight };
+}
+
+
