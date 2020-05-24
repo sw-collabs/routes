@@ -6,7 +6,7 @@ export const ID_PATH_G = 'paths';
 export const ID_STORE_SHELVES_G = 'store-shelves';
 
 export const GRID_CLR = '#dbdbdb';
-export const GRID_SIZE = 50;
+export const GRID_SIZE = 20;
 export const GRID_LINE_CONFIG = {'stroke-width': 0.5, 'stroke' : GRID_CLR};
 
 /* Section config */

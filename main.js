@@ -93,9 +93,9 @@ window.Main = {
           line(vec(i, 0), vec(i, height), GRID_LINE_CONFIG)
         );
         elems.push(
-          text(vec(i, 13), `${ind}`, {
+          text(vec(i, 5), `${ind}`, {
             'stroke': 'black',
-            'font-size': '10'
+            'font-size': '7'
           })
         )
       }
@@ -110,9 +110,9 @@ window.Main = {
           line(vec(0, i), vec(width, i), GRID_LINE_CONFIG)
         );
         elems.push(
-          text(vec(5, i+5), `${ind}`, {
+          text(vec(2, i+2), `${ind}`, {
             'stroke': 'black',
-            'font-size': '10'
+            'font-size': '7'
           })
         )
       }
