@@ -109,8 +109,10 @@ export function onDoneClick() {
  * in the currentElement variable
  */
 export function onInfoSubmit() {
-  if (currentElement === null)
+  if (currentElement === null) {
     alert('ERROR: current element is NULL!!');
+    return;
+  }
 
   const name = document.getElementById('element-name').value;
   const annotations = document.getElementById('annotations').value.split(',');
@@ -269,7 +271,6 @@ const sectionMouseUp = (evt) => {
 
   toggleElementForm(true);
 
-  currentElement = null;
   startPos = vec(null, null);
 };
 
@@ -305,7 +306,6 @@ const storeShelfMouseUp = (evt) => {
 
   toggleElementForm(true);
 
-  currentElement = null;
   startPos = vec(null, null);
 };
 
