@@ -19,6 +19,14 @@ export const STYLE_STORE_SHELF = {
   'fill': '#3c7eb5',
 };
 
+export const STYLE_STORE_SHELF_TEXT = {
+  'text-anchor': 'middle',
+  'font-family': 'Calibri, sans-serif',
+  'font-size': '1rem',
+  'fill': 'white',
+  'dominant-baseline': 'middle'
+};
+
 export const STYLE_PATH = {
   'stroke': 'red',
   'stroke-width': 2

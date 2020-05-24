@@ -144,4 +144,12 @@ export function getRectCorners(rect) {
   return { topLeft, botRight };
 }
 
+export function getRectCenter(rect) {
+  const { topLeft } = getRectCorners(rect);
+
+  return vec(
+    topLeft.x + parseFloat(rect.getAttribute('width')) / 2,
+    topLeft.y + parseFloat(rect.getAttribute('height')) / 2
+  )
+}
 

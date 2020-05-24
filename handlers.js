@@ -9,7 +9,8 @@ import {
   lineLineIntersection,
   rayBoxIntersection,
   snapToGrid,
-  getRectCorners
+  getRectCorners,
+  getRectCenter
 } from './lib.js';
 import {
   ID_SVG,
@@ -19,9 +20,10 @@ import {
   ID_STORE_SHELVES_G,
   STYLE_SECTION,
   STYLE_STORE_SHELF,
-  STYLE_PATH
+  STYLE_PATH,
+  STYLE_STORE_SHELF_TEXT
 } from './config.js';
-import {__ns, vec, vec3, cross3, rect, line, update, ASSERT_VEC} from './gl.js';
+import {__ns, vec, vec3, cross3, rect, line, update, ASSERT_VEC, text} from './gl.js';
 import * as gl from './gl.js';
 
 const SECTION = 'section';
@@ -115,6 +117,17 @@ export function onInfoSubmit() {
     case STORE_SHELF:
       id = `${ObjectSVGConfigs.STORE_SHELF_ID}-${int_storeShelfUUID}`;
       STORE_SHELVES[id] = new StoreShelf(id, topLeft, botRight, name, annotations);
+
+      /* Add text to store/shelf block  */
+      __ns(
+        document.getElementById(ID_STORE_SHELVES_G),
+        {},
+        text(
+          getRectCenter(currentElement),
+          name,
+          STYLE_STORE_SHELF_TEXT
+        )
+      );
       break;
     default:
       break;
