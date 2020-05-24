@@ -50,9 +50,10 @@ let int_storeShelfUUID = 0;
 let elementType = null;
 
 /* Put all objects here */
-let PATHS = {};
-let STORE_SHELVES = {};
-let SECTIONS = {};
+export let PATHS = {};
+export let STORE_SHELVES = {};
+export let SECTIONS = {};
+export let INTERSECTIONS = {};
 
 
 /////////////////////////////////////////////////////////////

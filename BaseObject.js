@@ -8,7 +8,8 @@ export default class BaseObject {
 export const ObjectTypes = {
   PATH: 'PATH',
   SECTION: 'SECTION',
-  STORE_SHELF: 'STORE_SHELF'
+  STORE_SHELF: 'STORE_SHELF',
+  INTERSECTION: 'INTERSECTION'
 };
 
 export const ObjectSVGConfigs = {

@@ -3,6 +3,8 @@ import BaseObject from "./BaseObject.js";
 import { ObjectTypes} from "./BaseObject.js";
 import {lineLineIntersection, rayBoxIntersection, snapToGrid} from "./lib.js";
 import {cross3, vec, vec3} from "./gl.js";
+import { STORE_SHELVES } from "./handlers.js";
+
 
 export default class Path extends BaseObject {
   constructor(id, from, to) {
@@ -83,7 +85,7 @@ export default class Path extends BaseObject {
         intersect(back, box);
       });
 
-      let newGrid, p;
+      let newGrid, p = currGrid;
       do {
         // p = p + 0.3*u
         p = gl.ADD(p, gl.SCALAR_MULT(0.3, this.unitVec));
