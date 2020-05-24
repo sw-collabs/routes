@@ -67,10 +67,11 @@ export function lineLineIntersection(line1PFrom,
   t = det(mat2(x1-x3, x3-x4, y1-y3, y3-y4)) / denom;
   u = det(mat2(x1-x2, x1-x3, y1-y2, y1-y3)) / denom;
 
+  // FIXME: very inefficient
   if ((t >= 0.0 && t <= 1.0) || (u >= 0.0 && u <= 1.0)) {
     let point = vec(
       x1 + t * (x2 - x1),
-      y1 + t * (y2-y1)
+      y1 + t * (y2 - y1)
     );
 
     let lenL1, lenL2;

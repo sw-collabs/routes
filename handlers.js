@@ -329,9 +329,10 @@ const pathMouseMove = (evt) => {
     __ns(document.getElementById(ID_SVG), {}, currentElement);
   } else {
     let delta = gl.ABS(gl.SUB(currPos, startPos));
+    let isX = delta.x >= delta.y;
     __ns(currentElement, {
-      x2: delta.x > delta.y ? currPos.x : startPos.x,
-      y2: delta.y > delta.x ? currPos.y : startPos.y
+      x2: isX ? currPos.x : startPos.x,
+      y2: !isX ? currPos.y : startPos.y
     })
   }
 };
@@ -344,15 +345,14 @@ const pathMouseUp = (evt) => {
   document.getElementById(ID_SVG).removeChild(currentElement);
   const NewPath = new Path(
     vec(
-      currentElement.getAttribute('x1'),
-      currentElement.getAttribute('y1')
+      parseFloat(currentElement.getAttribute('x1')),
+      parseFloat(currentElement.getAttribute('y1'))
     ),
     vec(
-      currentElement.getAttribute('x2'),
-      currentElement.getAttribute('y2')
+      parseFloat(currentElement.getAttribute('x2')),
+      parseFloat(currentElement.getAttribute('y2'))
     )
   );
-  console.log(NewPath);
   upsertIntersection(NewPath.from, NewPath);
   upsertIntersection(NewPath.to, NewPath);
 
