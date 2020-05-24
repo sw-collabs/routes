@@ -35,6 +35,8 @@ let currentElement = null;
 /* TRUE if mouse is released, FALSE if LEFT button is down*/
 let mouseUp = 1;
 
+let processingElemInfo = false;
+
 /* Position of mouse down event */
 let startPos = vec(null, null);
 let currPos = vec(null, null);
@@ -119,9 +121,7 @@ export function onInfoSubmit() {
   }
 
   toggleElementForm(false);
-
-  console.log(`sections: ${JSON.stringify(SECTIONS)}`);
-  console.log(`storeshelves: ${JSON.stringify(STORE_SHELVES)}`);
+  document.getElementById(ID_ELEMENT_FORM).reset();
 
   return false;
 }
@@ -149,6 +149,7 @@ export const StoreShelfHandlers = {
 const toggleElementForm = (show) => {
   let form = document.getElementById(ID_ELEMENT_FORM);
   form.style.display = show ? 'block' : 'none';
+  processingElemInfo = show;
 };
 
 ///////////////////////////////////////////////////////
@@ -188,10 +189,7 @@ const createRectangleEvt = (parent, pos, config, w=5, h=5) => {
  * @param evt
  */
 const updateRectangleEvt = (evt) => {
-  if (currentElement === null)
-    return;
-
-  if (mouseUp)
+  if (currentElement === null || mouseUp)
     return;
 
   /* Get snapped coordinates of mouse position*/
@@ -220,7 +218,7 @@ const updateRectangleEvt = (evt) => {
 ////////////////////////////////////////////////////////////////////////
 ////////// SECTION EVENT HANDLERS
 const sectionMouseDown = (evt) => {
-  if (elementType !== SECTION)
+  if (elementType !== SECTION || processingElemInfo)
     return;
 
   startPos = clientToSnapCoords(
@@ -236,27 +234,26 @@ const sectionMouseDown = (evt) => {
 };
 
 const sectionMouseMove = (evt) => {
-  if (elementType !== SECTION)
+  if (elementType !== SECTION || processingElemInfo)
     return;
 
   updateRectangleEvt(evt);
 };
 
 const sectionMouseUp = (evt) => {
-  if (elementType !== SECTION)
+  if (elementType !== SECTION || processingElemInfo)
     return;
 
   toggleElementForm(true);
 
   startPos = vec(null, null);
-
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 ////////// STORE-SHELF EVENT HANDLERS
 const storeShelfMouseDown = (evt) => {
-  if (elementType !== STORE_SHELF)
+  if (elementType !== STORE_SHELF || processingElemInfo)
     return;
 
   startPos = clientToSnapCoords(
@@ -272,14 +269,14 @@ const storeShelfMouseDown = (evt) => {
 };
 
 const storeShelfMouseMove = (evt) => {
-  if (elementType !== STORE_SHELF)
+  if (elementType !== STORE_SHELF || processingElemInfo)
     return;
 
   updateRectangleEvt(evt);
 };
 
 const storeShelfMouseUp = (evt) => {
-  if (elementType !== STORE_SHELF)
+  if (elementType !== STORE_SHELF || processingElemInfo)
     return;
 
   toggleElementForm(true);
