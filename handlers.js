@@ -120,6 +120,9 @@ export function onInfoSubmit() {
 
   toggleElementForm(false);
 
+  console.log(`sections: ${JSON.stringify(SECTIONS)}`);
+  console.log(`storeshelves: ${JSON.stringify(STORE_SHELVES)}`);
+
   return false;
 }
 
@@ -279,7 +282,7 @@ const storeShelfMouseUp = (evt) => {
   if (elementType !== STORE_SHELF)
     return;
 
-  toggleElementForm(true)
+  toggleElementForm(true);
 
   startPos = vec(null, null);
 };

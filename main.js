@@ -54,6 +54,7 @@ window.Main = {
   const initSVG = () => {
     let SVG = document.getElementById(ID_SVG);
 
+
     /*
      * Adds all event handlers defined from SVGEvents
      */
@@ -73,6 +74,7 @@ window.Main = {
     __ns(SVG, {}, g(ID_SECTION_G));
     __ns(SVG, {}, g(ID_STORE_SHELVES_G));
     __ns(SVG, {}, g(ID_PATH_G));
+
 
   };
 
