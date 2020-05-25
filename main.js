@@ -10,6 +10,7 @@ import {
   GRID_LINE_CONFIG,
   GRID_SIZE
 } from "./config.js";
+import Queue from "./Queue.js";
 
 
 /* Button Event Handlers */
@@ -52,10 +53,28 @@ window.Main = {
 /* Anything that needs to be initialized in svg is done here
  * (i.e. event handlers)
  */
+function testQueue() {
+  // Example queue usage:
+  let q = new Queue((v1, v2) => v1.key < v2.key);
+  for (let i=0; i<100; i++) {
+    let V = {key: Math.random()*100};
+    q.insert(V);
+
+    // Change the keys
+    V.key = Math.random()*200;
+  }
+  // Run reheap
+  q.reheap();
+
+  let v;
+  while (v = q.pop()) {
+    console.log(v);
+  }
+}
+
 {
   const initSVG = () => {
     let SVG = document.getElementById(ID_SVG);
-
 
     /*
      * Adds all event handlers defined from SVGEvents
