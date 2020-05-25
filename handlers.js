@@ -120,6 +120,14 @@ export function onDoneClick() {
   });
 }
 
+export function onExportClick() {
+  alert('export click');
+}
+
+export function onImportClick() {
+  alert('import click');
+}
+
 /*
  * Handles element info form submission
  * Should create a new StoreShelf/Section

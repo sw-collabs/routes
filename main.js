@@ -19,8 +19,11 @@ const ButtonEvents = {
   uiHandleStoreShelfClick: () => handlers.onStoreShelfClick(),
   uiHandlePathClick: () => handlers.onPathClick(),
   uiHandleDoneClick: () => handlers.onDoneClick(),
-  uiHandleInfoSubmit: () => handlers.onInfoSubmit()
+  uiHandleInfoSubmit: () => handlers.onInfoSubmit(),
+  uiHandleExportClick: () => handlers.onExportClick(),
+  uiHandleImportClick: () => handlers.onImportClick()
 };
+
 const SVGEvents = {
   'mousedown': [
     handlers.PathHandlers.mousedown,
