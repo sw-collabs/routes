@@ -19,12 +19,14 @@ export const STYLE_SECTION = {
 
 export const STYLE_STORE_SHELF = {
   'fill': '#3c7eb5',
+  'stroke-width' : 1,
+  'stroke' : '#75c1ff'
 };
 
 export const STYLE_STORE_SHELF_TEXT = {
   'text-anchor': 'middle',
   'font-family': 'Calibri, sans-serif',
-  'font-size': '1rem',
+  'font-size': '0.8rem',
   'fill': 'white',
   'dominant-baseline': 'middle'
 };
