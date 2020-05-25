@@ -6,6 +6,7 @@ import { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
 import {lineLineIntersection, rayBoxIntersection, snapToGrid, svgCoordsToGridCoords} from "./lib.js";
 import {cross3, vec, vec3} from "./gl.js";
 import { STORE_SHELVES } from "./handlers.js";
+import { getIntersection } from "./Intersection.js"
 
 const PATH_ID = (fromGrids, toGrids) => `${ObjectSVGConfigs.PATH_ID}-${gl.VEC_STR(fromGrids)}-${gl.VEC_STR(toGrids)}`;
 
@@ -121,9 +122,21 @@ export default class Path extends BaseObject {
 
       if (minFront !== null) {
         this.adjStoreShelves[minFront.id] = minFront;
+        minFront.addIntersections(
+          getIntersection(this.to)
+        );
+        minFront.addIntersections(
+          getIntersection(this.from)
+        );
       }
       if (minBack !== null) {
         this.adjStoreShelves[minBack.id] = minBack;
+        minBack.addIntersections(
+          getIntersection(this.to)
+        );
+        minBack.addIntersections(
+          getIntersection(this.from)
+        );
       }
 
       let newGrid, p = currGrid;
