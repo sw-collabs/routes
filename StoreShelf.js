@@ -13,6 +13,9 @@ export default class StoreShelf extends BaseObject {
 
     /* The section that this object is stored in */
     this.parentSection = null;
+
+    /* List of intersections that are 'connected' to the element*/
+    this.intersections = {};
   }
 
   center() {
@@ -27,5 +30,13 @@ export default class StoreShelf extends BaseObject {
       xmin + (xmax - xmin) / 2,
       ymin + (ymax - ymin) / 2
     )
+  }
+
+  addIntersections(..._intersections) {
+    _intersections.forEach(intersection => {
+      if (!this.intersections.hasOwnProperty(intersection.id)) {
+        this.intersections[intersection.id] = intersection;
+      }
+    });
   }
 }
