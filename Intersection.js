@@ -33,7 +33,7 @@ export function getPathFromIntersections(to, from) {
  * @param path  new path to add
  */
 export function upsertIntersection(point, path) {
-  let isection = getIntersection(svgCoordsToGridCoords(point));
+  let isection = getIntersection(point);
   if (isection === null) {
     isection = new Intersection(point);
     INTERSECTIONS[isection.id] = isection;
