@@ -1,6 +1,7 @@
 import StoreShelf, { importStoreShelf, getStoreShelfByName } from "./StoreShelf.js";
 import BaseObject, { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
 import Section, { importSection } from "./Section.js";
+import dijkstra from "./dijkstra.js"
 import Intersection, {
   getIntersection,
   upsertIntersection,
@@ -29,7 +30,8 @@ import {
   STYLE_STORE_SHELF,
   STYLE_PATH,
   STYLE_STORE_SHELF_TEXT,
-  STYLE_ADJ_DISPLAY
+  STYLE_ADJ_DISPLAY,
+  STYLE_SHORTEST_PATH
 } from './config.js';
 import {__ns, vec, vec3, cross3, rect, line, update, ASSERT_VEC, text} from './gl.js';
 import * as gl from './gl.js';
@@ -246,16 +248,30 @@ export function onShoppingListSubmit() {
    *    TODO travelling salesman - expand to  multiple
    *     items
    */
-  const list = document.getElementById("shopping-list").value();
+  const list = document.getElementById("shopping-list").value;
   const storeShelves = list.split('\n').map(item => getStoreShelfByName(item));
-  const start = getIntersection('intersection-32-32');
+  const start = INTERSECTIONS['intersection-32-23'];
 
   storeShelves.forEach(storeShelf => {
-    let path = dijkstra(
-      start,
-      storeShelf.intersections
-    )
+    console.log(`Computing shortest path to: ${storeShelf.name}`);
+    let path = [];
+    try {
+      path = dijkstra(
+        start,
+        Object.values(storeShelf.intersections)
+      );
+    } catch (ex) {
+      console.log(ex);
+    }
+
     //TODO colour path
+    path.forEach(p => {
+      __ns(
+        document.getElementById(ID_SVG),
+        {},
+        line(p.to, p.from, STYLE_SHORTEST_PATH)
+      );
+    })
   });
 
 

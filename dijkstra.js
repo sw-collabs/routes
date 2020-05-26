@@ -1,9 +1,11 @@
-import { INTERSECTIONS } from "./handlers";
+import { INTERSECTIONS } from "./handlers.js";
 import Queue from "./Queue.js"
+import { getIntersection } from "./Intersection.js"
+import { getPathByIntersections } from "./Path.js";
 
 const initializeGraph = (src) => {
   let G = {};
-  INTERSECTIONS.forEach(isection => {
+  Object.values(INTERSECTIONS).forEach(isection => {
     G[isection.id] = {
       id: isection.id,
       pred: null,
@@ -34,16 +36,20 @@ const backtrace = (G, dest) => {
   let P = [];
 
   let curr = dest;
-  while (curr !== null) {
+  while (curr.pred !== null) {
     P.push(
-      Object.values(INTERSECTIONS[curr.id].connectedPaths).find()
+      getPathByIntersections(
+        INTERSECTIONS[curr.id].point,
+        INTERSECTIONS[curr.pred.id].point
+      )
     );
     curr = curr.pred;
   }
   return P;
 };
 
-export function dijkstra(src, dests) {
+export default function dijkstra(src, dests) {
+  dests.forEach(d => console.log(d.id));
   /*
    * 1. initialize graph - set all weights to infinity
    * 2. Closed set is empty
@@ -62,6 +68,7 @@ export function dijkstra(src, dests) {
 
   let curr;
   while (Q.size() > 0) {
+    Q.reheap();
     curr = Q.pop();
     if (dests.find(v => v.id === curr.id)) {
       break;
@@ -69,7 +76,7 @@ export function dijkstra(src, dests) {
     S[curr.id] = curr;
 
     let currISection = INTERSECTIONS[curr.id];
-    currISection.connectedPaths.forEach(path => {
+    Object.values(currISection.connectedPaths).forEach(path => {
       /*
        * 1. Get the path.to, path.from Intersection
        *    objects and determine which isection is
