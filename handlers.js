@@ -1,4 +1,4 @@
-import StoreShelf, { importStoreShelf } from "./StoreShelf.js";
+import StoreShelf, { importStoreShelf, getStoreShelfByName } from "./StoreShelf.js";
 import BaseObject, { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
 import Section, { importSection } from "./Section.js";
 import Intersection, {
@@ -234,6 +234,31 @@ export function onInfoSubmit() {
   document.getElementById(ID_ELEMENT_FORM).reset();
 
   return false;
+}
+
+export function onShoppingListSubmit() {
+  /*
+   * 1. Get shopping list from form field
+   * 2. For now -- perform dijkstra to find the shortest
+   *    path from entrance to a /single/ item on the list
+   *    Dijkstra should return a list of PATH objects
+   *    indicating the shortest path
+   *    TODO travelling salesman - expand to  multiple
+   *     items
+   */
+  const list = document.getElementById("shopping-list").value();
+  const storeShelves = list.split('\n').map(item => getStoreShelfByName(item));
+  const start = getIntersection('intersection-32-32');
+
+  storeShelves.forEach(storeShelf => {
+    let path = dijkstra(
+      start,
+      storeShelf.intersections
+    )
+    //TODO colour path
+  });
+
+
 }
 
 export const PathHandlers = {

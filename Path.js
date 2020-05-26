@@ -30,6 +30,7 @@ export function importPath(json) {
   return path; // for convenience
 }
 
+// TODO Add weight
 export default class Path extends BaseObject {
   constructor(from, to) {
     let id = PATH_ID(svgCoordsToGridCoords(from), svgCoordsToGridCoords(to));
@@ -39,6 +40,7 @@ export default class Path extends BaseObject {
     this.to = to;
     this.unitVec = gl.NORMALIZE(gl.SUB(to, from));
     this.adjStoreShelves = {};
+    this.weight = 1;
 
     this.idLine = `${id}-line`;
 

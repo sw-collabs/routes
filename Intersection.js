@@ -18,6 +18,11 @@ export function getIntersection(point) {
     : null;
 }
 
+export function getPathFromIntersections(to, from) {
+  return Object.values(INTERSECTIONS[a.id].connectedPaths)
+    .find(p => getIntersection(p))
+}
+
 /**
  * If an intersection at 'point' (in svg coordinates) exists,
  * then adds 'path' to its adjacent paths list.

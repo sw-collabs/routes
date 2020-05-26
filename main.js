@@ -20,7 +20,8 @@ const ButtonEvents = {
   uiHandlePathClick: () => handlers.onPathClick(),
   uiHandleDoneClick: () => handlers.onDoneClick(),
   uiHandleInfoSubmit: () => handlers.onInfoSubmit(),
-  uiHandleExportClick: () => handlers.onExportClick()
+  uiHandleExportClick: () => handlers.onExportClick(),
+  uiHandleShoppingListSubmit: () => handlers.onShoppingListSubmit()
 };
 
 const SVGEvents = {

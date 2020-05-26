@@ -6,6 +6,12 @@ import {__ns, text} from "./gl.js";
 import {ID_STORE_SHELVES_G, STYLE_STORE_SHELF, STYLE_STORE_SHELF_TEXT} from "./config.js";
 import {getRectCenter} from "./lib.js";
 
+
+export function getStoreShelfByName(name) {
+  return Object.values(STORE_SHELVES)
+    .find(storeShelf => storeShelf.name === name);
+}
+
 /**
  * IMPORTANT: must be invoked 2 times:
  *
