@@ -30,7 +30,30 @@ export function importPath(json) {
   return path; // for convenience
 }
 
-// TODO Add weight
+/**
+ * All coords must be in SVG coords
+ *
+ * @param i1Coords
+ * @param i2Coords
+ */
+export function getPathByIntersections(i1Coords, i2Coords) {
+  let i1Grid, i2Grid;
+
+  i1Grid = svgCoordsToGridCoords(i1Coords);
+  i2Grid = svgCoordsToGridCoords(i2Coords);
+
+  // 2 possible combinations of ids
+  let id1, id2;
+  id1 = PATH_ID(i1Grid, i2Grid);
+  id2 = PATH_ID(i2Grid, i1Grid);
+
+  if (PATHS.hasOwnProperty(id1)) {
+    return PATHS[id1];
+  } else if (PATHS.hasOwnProperty(id2)) {
+    return PATHS[id2];
+  }
+}
+
 export default class Path extends BaseObject {
   constructor(from, to) {
     let id = PATH_ID(svgCoordsToGridCoords(from), svgCoordsToGridCoords(to));
@@ -40,7 +63,7 @@ export default class Path extends BaseObject {
     this.to = to;
     this.unitVec = gl.NORMALIZE(gl.SUB(to, from));
     this.adjStoreShelves = {};
-    this.weight = 1;
+    this.weight = gl.DISTANCE(gl.SUB(to, from));
 
     this.idLine = `${id}-line`;
 
