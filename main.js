@@ -118,9 +118,10 @@ function testQueue() {
           line(vec(i, 0), vec(i, height), GRID_LINE_CONFIG)
         );
         elems.push(
-          text(vec(i, 5), `${ind}`, {
-            'fill': 'black',
-            'font-size': '7'
+          text(vec(i, 8), `${ind}`, {
+            'fill': 'white',
+            'font-family': 'Helvetica',
+            'font-size': '10'
           })
         )
       }
@@ -136,8 +137,9 @@ function testQueue() {
         );
         elems.push(
           text(vec(0, i+2), `${ind}`, {
-            'stroke': 'fill',
-            'font-size': '7'
+            'fill': 'white',
+            'font-family': 'Helvetica',
+            'font-size': '10'
           })
         )
       }

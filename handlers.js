@@ -252,7 +252,7 @@ export function onShoppingListSubmit() {
    */
   const list = document.getElementById("shopping-list").value;
   const storeShelves = list.split('\n').map(item => getStoreShelfByName(item));
-  const start = INTERSECTIONS['intersection-21-14'];
+  const start = INTERSECTIONS['intersection-45-17'];
 
   storeShelves.forEach(storeShelf => {
     console.log(`Computing shortest path to: ${storeShelf.name}`);

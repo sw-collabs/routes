@@ -14,7 +14,7 @@ export const GRID_LINE_CONFIG = {'stroke-width': 0.5, 'stroke' : GRID_CLR};
 export const STYLE_SECTION = {
   'fill-opacity': 0,
   'stroke-width': 2,
-  'stroke': 'black'
+  'stroke': 'beige'
 };
 
 export const STYLE_STORE_SHELF = {
@@ -42,7 +42,7 @@ export const STYLE_SHORTEST_PATH = {
 };
 
 export const STYLE_INTERSECTION = {
-  'fill': 'black'
+  'fill': 'orange'
 };
 
 export const STYLE_ADJ_DISPLAY = {
