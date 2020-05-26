@@ -188,7 +188,6 @@ export function onImportClick() {
     // Section
     json.SECTIONS.forEach(section => importSection(section));
 
-    console.log(PATHS);
     onDoneClick();
   });
 
