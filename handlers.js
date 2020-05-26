@@ -1,13 +1,13 @@
-import StoreShelf from "./StoreShelf.js";
-import BaseObject from "./BaseObject.js";
-import Section from "./Section.js";
+import StoreShelf, { importStoreShelf } from "./StoreShelf.js";
+import BaseObject, { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
+import Section, { importSection } from "./Section.js";
 import Intersection, {
   getIntersection,
   upsertIntersection,
-  removeFromIntersection
+  removeFromIntersection,
+  importIntersection
 } from "./Intersection.js";
-import Path from "./Path.js";
-import { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
+import Path, { importPath } from "./Path.js";
 
 import {
   clientToSnapCoords,
@@ -41,6 +41,8 @@ const PATH = 'path';
 
 /* The current element being edited/rendered by the user */
 let currentElement = null;
+const STORE_SHELF_TMP_ID = 'STORE_SHELF_TMP';
+const SECTION_TMP_ID = 'SECTION_TMP';
 
 /* TRUE if mouse is released, FALSE if LEFT button is down*/
 let mouseUp = 1;
@@ -120,12 +122,76 @@ export function onDoneClick() {
   });
 }
 
+/**
+ * Put everything into a JSON object:
+ * {
+ *   PATHS: [...],
+ *   INTERSECTIONS: [...],
+ *   STORE_SHELVES: [...],
+ *   SECTIONS: [...]
+ * }
+ */
 export function onExportClick() {
-  alert('export click');
+  let out = {
+    PATHS: [],
+    INTERSECTIONS: [],
+    STORE_SHELVES: [],
+    SECTIONS: []
+  };
+
+  // Paths
+  Object.values(PATHS).forEach(path =>
+    out.PATHS.push(path.json())
+  );
+  Object.values(INTERSECTIONS).forEach(isection =>
+    out.INTERSECTIONS.push(isection.json())
+  );
+  Object.values(STORE_SHELVES).forEach(storeShelf =>
+    out.STORE_SHELVES.push(storeShelf.json())
+  );
+  Object.values(SECTIONS).forEach(section =>
+    out.SECTIONS.push(section.json())
+  );
+
+  {
+    let file = new Blob([JSON.stringify(out)], {type: "application/json"});
+    let a = document.createElement("a"),
+      url = URL.createObjectURL(file);
+    a.href = url;
+    a.download = 'export.json';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }, 0);
+  }
 }
 
 export function onImportClick() {
-  alert('import click');
+  const FILE = this.files[0];
+  FILE.text().then(text => {
+    const json = JSON.parse(text);
+
+    // StoreShelf (pt 1)
+    json.STORE_SHELVES.forEach(storeShelf => importStoreShelf(storeShelf));
+
+    // Path
+    json.PATHS.forEach(path => importPath(path));
+
+    // Intersection
+    json.INTERSECTIONS.forEach(isection => importIntersection(isection));
+
+    // StoreShelf (pt 2)
+    json.STORE_SHELVES.forEach(storeShelf => importStoreShelf(storeShelf));
+
+    // Section
+    json.SECTIONS.forEach(section => importSection(section));
+
+    console.log(PATHS);
+    onDoneClick();
+  });
+
 }
 
 /*
@@ -150,23 +216,16 @@ export function onInfoSubmit() {
   let id;
   switch (elementType) {
     case SECTION:
-      id = `${ObjectSVGConfigs.SECTION_ID}-${int_sectionUUID}`;
+      id = `${ObjectSVGConfigs.SECTION_ID}-${int_sectionUUID++}`;
       SECTIONS[id] = new Section(id, topLeft, botRight, name, annotations);
+
+      document.getElementById(SECTION_TMP_ID).remove();
       break;
     case STORE_SHELF:
-      id = `${ObjectSVGConfigs.STORE_SHELF_ID}-${int_storeShelfUUID}`;
+      id = `${ObjectSVGConfigs.STORE_SHELF_ID}-${int_storeShelfUUID++}`;
       STORE_SHELVES[id] = new StoreShelf(id, topLeft, botRight, name, annotations);
 
-      /* Add text to store/shelf block  */
-      __ns(
-        document.getElementById(ID_STORE_SHELVES_G),
-        {},
-        text(
-          getRectCenter(currentElement),
-          name,
-          STYLE_STORE_SHELF_TEXT
-        )
-      );
+      document.getElementById(STORE_SHELF_TMP_ID).remove();
       break;
     default:
       break;
@@ -282,7 +341,7 @@ const sectionMouseDown = (evt) => {
     document.getElementById(ID_SECTION_G),
     startPos, {
     ...STYLE_SECTION,
-    id: `${ObjectSVGConfigs.SECTION_ID}-${++int_sectionUUID}`
+    id: SECTION_TMP_ID
   });
 };
 
@@ -317,7 +376,7 @@ const storeShelfMouseDown = (evt) => {
     document.getElementById(ID_STORE_SHELVES_G),
     startPos, {
     ...STYLE_STORE_SHELF,
-    id: `${ObjectSVGConfigs.STORE_SHELF_ID}-${++int_storeShelfUUID}`
+    id: STORE_SHELF_TMP_ID
   });
 };
 
@@ -333,7 +392,6 @@ const storeShelfMouseUp = (evt) => {
     return;
 
   toggleElementForm(true);
-
   startPos = vec(null, null);
 };
 

@@ -2,11 +2,12 @@ import BaseObject, {ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
 import { __ns, rect, vec } from "./gl.js";
 import * as gl from "./gl.js";
 import { svgCoordsToGridCoords } from "./lib.js";
-import { INTERSECTIONS } from "./handlers.js";
+import { INTERSECTIONS, PATHS } from "./handlers.js";
 import { ID_INTERSECTION_G, STYLE_INTERSECTION } from "./config.js";
 
 const SYMBOL_WIDTH_HEIGHT = 5;
 const INTERSECTION_ID = coords => `${ObjectSVGConfigs.INTERSECTION_ID}-${coords.x}-${coords.y}`;
+
 
 export function getIntersection(point) {
   let id = INTERSECTION_ID(svgCoordsToGridCoords(point));
@@ -61,6 +62,27 @@ export function removeFromIntersection(point, path) {
   }
 }
 
+/**
+ * Note: expects PATHS to be fully populated
+ *
+ * @param json: {
+ *  point,
+ *  connectedPaths
+ * }
+ */
+export function importIntersection(json) {
+  let isection = new Intersection(json.point);
+  json.connectedPaths.forEach(pathId => {
+    console.assert(PATHS.hasOwnProperty(pathId));
+    isection.connectedPaths[pathId] = PATHS[pathId];
+  });
+
+  console.assert(!INTERSECTIONS.hasOwnProperty(isection.id));
+  INTERSECTIONS[isection.id] = isection;
+
+  return isection; // for convenience
+}
+
 export default class Intersection extends BaseObject {
   constructor(point) {
     let id = INTERSECTION_ID(svgCoordsToGridCoords(point));
@@ -105,6 +127,13 @@ export default class Intersection extends BaseObject {
     }
 
     return Object.keys(this.connectedPaths).length > 0;
+  }
+
+  json() {
+    return {
+      point: this.point,
+      connectedPaths: Object.values(this.connectedPaths).map(path => path.id)
+    };
   }
 
   undraw() {

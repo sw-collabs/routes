@@ -5,10 +5,30 @@ import { ID_PATH_G, STYLE_PATH, GRID_SIZE } from "./config.js";
 import { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
 import {lineLineIntersection, rayBoxIntersection, snapToGrid, svgCoordsToGridCoords} from "./lib.js";
 import {cross3, vec, vec3} from "./gl.js";
-import { STORE_SHELVES } from "./handlers.js";
+import { STORE_SHELVES, PATHS } from "./handlers.js";
 import { getIntersection } from "./Intersection.js"
 
 const PATH_ID = (fromGrids, toGrids) => `${ObjectSVGConfigs.PATH_ID}-${gl.VEC_STR(fromGrids)}-${gl.VEC_STR(toGrids)}`;
+
+
+/**
+ * Note: expects STORE_SHELVES to be fully populated.
+ * @param json: {
+ *   from,
+ *   to,
+ *   adjStoreShelves
+ * }
+ */
+export function importPath(json) {
+  let path = new Path(json.from, json.to);
+  json.adjStoreShelves.forEach(shelfId => {
+    console.assert(STORE_SHELVES.hasOwnProperty(shelfId));
+    path.adjStoreShelves[shelfId] = STORE_SHELVES[shelfId];
+  });
+
+  PATHS[path.id] = path;
+  return path; // for convenience
+}
 
 export default class Path extends BaseObject {
   constructor(from, to) {
@@ -191,6 +211,14 @@ export default class Path extends BaseObject {
       x2: to.x,
       y2: to.y
     });
+  }
+
+  json() {
+    return {
+      from: this.from,
+      to: this.to,
+      adjStoreShelves: Object.values(this.adjStoreShelves).map(shelf => shelf.id)
+    };
   }
 
   undraw() {

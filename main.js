@@ -20,8 +20,7 @@ const ButtonEvents = {
   uiHandlePathClick: () => handlers.onPathClick(),
   uiHandleDoneClick: () => handlers.onDoneClick(),
   uiHandleInfoSubmit: () => handlers.onInfoSubmit(),
-  uiHandleExportClick: () => handlers.onExportClick(),
-  uiHandleImportClick: () => handlers.onImportClick()
+  uiHandleExportClick: () => handlers.onExportClick()
 };
 
 const SVGEvents = {
@@ -77,6 +76,7 @@ function testQueue() {
 
 {
   const initSVG = () => {
+    document.getElementById("import").addEventListener("change", handlers.onImportClick);
     let SVG = document.getElementById(ID_SVG);
 
     /*
