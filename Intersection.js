@@ -52,7 +52,7 @@ export function upsertIntersection(point, path) {
  * @param path  to remove
  */
 export function removeFromIntersection(point, path) {
-  let isection = getIntersection(svgCoordsToGridCoords(point));
+  let isection = getIntersection(point);
   if (isection !== null) {
     let isDangling = isection.removePath(path);
     if (isDangling) {
