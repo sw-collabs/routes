@@ -68,7 +68,6 @@ export default function dijkstra(src, dests) {
 
   let curr;
   while (Q.size() > 0) {
-    Q.reheap();
     curr = Q.pop();
     if (dests.find(v => v.id === curr.id)) {
       break;
@@ -89,6 +88,8 @@ export default function dijkstra(src, dests) {
         getIntersection(path.from) : to;
       relax(G, currISection, adjISection, path.weight);
     });
+
+    Q.reheap();
   }
 
   return backtrace(G, curr);

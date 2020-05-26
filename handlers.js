@@ -266,7 +266,7 @@ export function onShoppingListSubmit() {
       console.log(ex);
     }
 
-    //TODO colour path
+    // Color in the paths
     path.forEach(p => {
       __ns(
         document.getElementById(ID_SVG),
