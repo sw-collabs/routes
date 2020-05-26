@@ -36,6 +36,11 @@ export const STYLE_PATH = {
   'stroke-width': 4
 };
 
+export const STYLE_SHORTEST_PATH = {
+  'stroke': 'red',
+  'stroke-width': 4
+};
+
 export const STYLE_INTERSECTION = {
   'fill': 'black'
 };
