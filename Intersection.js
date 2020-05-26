@@ -53,8 +53,9 @@ export function upsertIntersection(point, path) {
  */
 export function removeFromIntersection(point, path) {
   let isection = getIntersection(point);
+  console.log(isection, point, path);
   if (isection !== null) {
-    let isDangling = isection.removePath(path);
+    let isDangling = !isection.removePath(path);
     if (isDangling) {
       isection.undraw();
       delete INTERSECTIONS[isection.id];

@@ -122,6 +122,7 @@ export function onDoneClick() {
       }
     });
   });
+  console.log(INTERSECTIONS);
 }
 
 /**
@@ -191,6 +192,7 @@ export function onImportClick() {
     json.SECTIONS.forEach(section => importSection(section));
 
     onDoneClick();
+    console.log(INTERSECTIONS);
   });
 
 }
@@ -250,7 +252,7 @@ export function onShoppingListSubmit() {
    */
   const list = document.getElementById("shopping-list").value;
   const storeShelves = list.split('\n').map(item => getStoreShelfByName(item));
-  const start = INTERSECTIONS['intersection-32-23'];
+  const start = INTERSECTIONS['intersection-21-14'];
 
   storeShelves.forEach(storeShelf => {
     console.log(`Computing shortest path to: ${storeShelf.name}`);
@@ -532,8 +534,8 @@ const pathMouseUp = (evt) => {
 
         // Initialize cut segments for 'other' path
         if (otherSegments.length > 0) {
-          removeFromIntersection(path.from, currPath);
-          removeFromIntersection(path.to, currPath);
+          removeFromIntersection(path.from, path);
+          removeFromIntersection(path.to, path);
           path.undraw();
           delete PATHS[path.id];
 
