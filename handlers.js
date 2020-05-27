@@ -272,15 +272,9 @@ export function onShoppingListSubmit() {
     });
 
     pathsList = nearestNeighbor(clusters, start, end);
-  } catch (e) {
-    console.error(e);
-    return;
-  }
-
-  for (let paths of pathsList) {
-    for (let path of paths) {
+    for (let paths of pathsList) {
       // Color in the paths
-      path.forEach(p => {
+      paths.forEach(p => {
         __ns(
           document.getElementById(ID_SVG),
           {},
@@ -288,7 +282,11 @@ export function onShoppingListSubmit() {
         );
       });
     }
+  } catch (e) {
+    console.error(e);
+    return;
   }
+
 
 }
 

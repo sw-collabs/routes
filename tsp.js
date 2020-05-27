@@ -34,6 +34,7 @@ export function nearestNeighbor(clusters, start, end) {
 
   currIsection = firstVisit;
   while (currIsection.id !== end.id) {
+    console.log(currIsection);
     let min = Infinity;
     let minPoint = null;
     let minCluster = null;

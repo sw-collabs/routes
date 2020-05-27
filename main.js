@@ -97,10 +97,10 @@ function testQueue() {
      * Section, Store/Shelf, Path
      */
     __ns(SVG, {}, g(ID_SECTION_G));
+    __ns(SVG, {}, g(ID_DISPLAY_LAYER_G));
     __ns(SVG, {}, g(ID_STORE_SHELVES_G));
     __ns(SVG, {}, g(ID_PATH_G));
     __ns(SVG, {}, g(ID_INTERSECTION_G));
-    __ns(SVG, {}, g(ID_DISPLAY_LAYER_G));
   };
 
   /* Initialize grid on svg canvas */

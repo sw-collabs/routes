@@ -26,6 +26,7 @@ export const STYLE_STORE_SHELF = {
 export const STYLE_STORE_SHELF_TEXT = {
   'text-anchor': 'middle',
   'font-family': 'Calibri, sans-serif',
+  'z-index': 99,
   'font-size': '0.8rem',
   'fill': 'white',
   'dominant-baseline': 'middle'

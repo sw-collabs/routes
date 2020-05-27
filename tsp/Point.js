@@ -70,7 +70,7 @@ export default class Point {
       svgCoordsToGridCoords(this.intersection.point)
     );
 
-    let route;
+    let route = null;
     if (this.routes.hasOwnProperty(id1)) {
       route = this.routes[id1];
     } else if (this.routes.hasOwnProperty(id2)) {
@@ -87,6 +87,7 @@ export default class Point {
       this.routes[id1] = route;
     }
 
+    console.log(route);
     return {
       distance: route.distance,
       paths: route.paths
