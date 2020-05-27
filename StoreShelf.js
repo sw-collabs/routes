@@ -102,6 +102,10 @@ export default class StoreShelf extends BaseObject {
     )
   }
 
+  update(config={}) {
+    __ns(document.getElementById(this.id), config);
+  }
+
   addIntersections(..._intersections) {
     _intersections.forEach(intersection => {
       if (!this.intersections.hasOwnProperty(intersection.id)) {

@@ -255,13 +255,21 @@ export function onShoppingListSubmit() {
    *    path from entrance to a /single/ item on the list
    *    Dijkstra should return a list of PATH objects
    *    indicating the shortest path
-   *    TODO travelling salesman - expand to  multiple
-   *     items
    */
   const list = document.getElementById("shopping-list").value;
   const storeShelves = list.split('\n').map(item => getStoreShelfByName(item));
   const start = INTERSECTIONS['intersection-54-17'];
   const end = INTERSECTIONS['intersection-9-34'];
+
+  // Highlight storeshelves
+  {
+    try {
+      storeShelves.forEach(shelf =>
+        shelf.update({'fill': 'red'}));
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   let clusters = {};
   let pathsList = [];
@@ -272,6 +280,12 @@ export function onShoppingListSubmit() {
     });
 
     pathsList = nearestNeighbor(clusters, start, end);
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+
+  {
     for (let paths of pathsList) {
       // Color in the paths
       paths.forEach(p => {
@@ -282,12 +296,7 @@ export function onShoppingListSubmit() {
         );
       });
     }
-  } catch (e) {
-    console.error(e);
-    return;
   }
-
-
 }
 
 export const PathHandlers = {
