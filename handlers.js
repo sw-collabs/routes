@@ -2,6 +2,7 @@ import StoreShelf, { importStoreShelf, getStoreShelfByName } from "./StoreShelf.
 import BaseObject, { ObjectTypes, ObjectSVGConfigs } from "./BaseObject.js";
 import Section, { importSection } from "./Section.js";
 import dijkstra from "./dijkstra.js"
+import Cluster from "./tsp/Cluster.js";
 import Intersection, {
   getIntersection,
   upsertIntersection,
@@ -35,6 +36,7 @@ import {
 } from './config.js';
 import {__ns, vec, vec3, cross3, rect, line, update, ASSERT_VEC, text} from './gl.js';
 import * as gl from './gl.js';
+import {nearestNeighbor} from "./tsp.js";
 
 const SECTION = 'section';
 const STORE_SHELF = 'store-shelf';
@@ -211,7 +213,7 @@ export function onInfoSubmit() {
     return;
   }
 
-  const name = document.getElementById('element-name').value;
+  let name = document.getElementById('element-name').value;
   const annotations = document.getElementById('annotations').value.split(',');
 
   let { topLeft, botRight } = getRectCorners(currentElement);
@@ -220,12 +222,18 @@ export function onInfoSubmit() {
   switch (elementType) {
     case SECTION:
       id = `${ObjectSVGConfigs.SECTION_ID}-${int_sectionUUID++}`;
+      if (name === '') {
+        name = int_sectionUUID.toString();
+      }
       SECTIONS[id] = new Section(id, topLeft, botRight, name, annotations);
 
       document.getElementById(SECTION_TMP_ID).remove();
       break;
     case STORE_SHELF:
       id = `${ObjectSVGConfigs.STORE_SHELF_ID}-${int_storeShelfUUID++}`;
+      if (name === '') {
+        name = int_storeShelfUUID.toString();
+      }
       STORE_SHELVES[id] = new StoreShelf(id, topLeft, botRight, name, annotations);
 
       document.getElementById(STORE_SHELF_TMP_ID).remove();
@@ -252,30 +260,35 @@ export function onShoppingListSubmit() {
    */
   const list = document.getElementById("shopping-list").value;
   const storeShelves = list.split('\n').map(item => getStoreShelfByName(item));
-  const start = INTERSECTIONS['intersection-45-17'];
+  const start = INTERSECTIONS['intersection-54-17'];
+  const end = INTERSECTIONS['intersection-9-34'];
 
-  storeShelves.forEach(storeShelf => {
-    console.log(`Computing shortest path to: ${storeShelf.name}`);
-    let path = [];
-    try {
-      path = dijkstra(
-        start,
-        Object.values(storeShelf.intersections)
-      );
-    } catch (ex) {
-      console.log(ex);
+  let clusters = {};
+  let pathsList = [];
+  try {
+    storeShelves.forEach(storeShelf => {
+      let cluster = new Cluster(storeShelf, storeShelves);
+      clusters[cluster.id] = cluster;
+    });
+
+    pathsList = nearestNeighbor(clusters, start, end);
+  } catch (e) {
+    console.error(e);
+    return;
+  }
+
+  for (let paths of pathsList) {
+    for (let path of paths) {
+      // Color in the paths
+      path.forEach(p => {
+        __ns(
+          document.getElementById(ID_SVG),
+          {},
+          line(p.to, p.from, STYLE_SHORTEST_PATH)
+        );
+      });
     }
-
-    // Color in the paths
-    path.forEach(p => {
-      __ns(
-        document.getElementById(ID_SVG),
-        {},
-        line(p.to, p.from, STYLE_SHORTEST_PATH)
-      );
-    })
-  });
-
+  }
 
 }
 

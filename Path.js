@@ -8,7 +8,7 @@ import {cross3, vec, vec3} from "./gl.js";
 import { STORE_SHELVES, PATHS } from "./handlers.js";
 import { getIntersection } from "./Intersection.js"
 
-const PATH_ID = (fromGrids, toGrids) => `${ObjectSVGConfigs.PATH_ID}-${gl.VEC_STR(fromGrids)}-${gl.VEC_STR(toGrids)}`;
+export const PATH_ID = (fromGrids, toGrids) => `${ObjectSVGConfigs.PATH_ID}-${gl.VEC_STR(fromGrids)}-${gl.VEC_STR(toGrids)}`;
 
 
 /**

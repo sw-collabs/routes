@@ -3,18 +3,34 @@ import Queue from "./Queue.js"
 import { getIntersection } from "./Intersection.js"
 import { getPathByIntersections } from "./Path.js";
 
+let G = null;
+
+/**
+ * IMPORTANT NOTE: Dijkstra algorithm will only be
+ * correct in this case if the data set (i.e. INTERSECTIONS)
+ * remains consistent throughout consecutive invocations
+ * of Dijkstra.
+ *
+ * @param src The source point
+ */
 const initializeGraph = (src) => {
-  let G = {};
-  Object.values(INTERSECTIONS).forEach(isection => {
-    G[isection.id] = {
-      id: isection.id,
-      pred: null,
-      dist: Infinity
-    }
-  });
+  if (G === null) {
+    G = {};
+    Object.values(INTERSECTIONS).forEach(isection => {
+      G[isection.id] = {
+        id: isection.id,
+        pred: null,
+        dist: Infinity
+      }
+    });
+  } else {
+    Object.values(G).forEach(v => {
+      v.pred = null;
+      v.dist = Infinity;
+    });
+  }
 
   G[src.id].dist = 0;
-  return G;
 };
 
 /**
@@ -48,8 +64,12 @@ const backtrace = (G, dest) => {
   return P;
 };
 
+/**
+ * @param src: Intersection object
+ * @param dests: List of Intersection objects
+ * @returns {[]}
+ */
 export default function dijkstra(src, dests) {
-  dests.forEach(d => console.log(d.id));
   /*
    * 1. initialize graph - set all weights to infinity
    * 2. Closed set is empty
@@ -60,7 +80,7 @@ export default function dijkstra(src, dests) {
    *      For each of [u]'s adjacent vertices, relax
    */
 
-  let G = initializeGraph(src);
+  initializeGraph(src);
   let S = {}; // closed set
 
   let Q = new Queue((a, b) => a.dist < b.dist);
