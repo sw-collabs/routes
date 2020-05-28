@@ -1,6 +1,9 @@
 import dijkstra from "./dijkstra.js";
 import Point from "./tsp/Point.js";
 
+const MAX_MIN_COUNT = 10; // Detect when local minimum is reached for 2-opt
+
+
 export function tourLength(Tour) {
   let length = 0;
 
@@ -96,6 +99,26 @@ export function nearestNeighbor(clusters, start, end) {
   return Tour;
 }
 
+export function twoOpt(Tour, MAX_ITERS) {
+  let iters = 0;
+  let minLength = tourLength(Tour);
+
+  let minCount = 0;
+  while (minCount < MAX_MIN_COUNT && iters < MAX_ITERS) {
+    let newTour = twoOptSwap(Tour);
+    let len = tourLength(newTour);
+    if (len < minLength) {
+      Tour = newTour;
+      minLength = len;
+      minCount = 0; // reset minCount
+    } else {
+      minCount++;
+    }
+
+    iters++;
+  }
+}
+
 /**
  * Returns new Tour after a single round of 2-opt
  * @param Tour
@@ -106,6 +129,7 @@ export function twoOptSwap(Tour) {
     return Tour;
   }
 
+  // 0 ... i, i+1, ..., k, k+1, ..., Tour.length-1
   let i, k;
   i = Math.floor(Math.random() * (Tour.length - 2)) + 1;
   k = Math.floor(Math.random() * (Tour.length - i - 2)) + i + 1;
