@@ -1,4 +1,7 @@
 export const ID_SVG = 'main-svg';
+export const ID_GRID_LINES = 'grid-lines';
+export const ID_OPT_TSP_TOUR_G = 'opt-tsp-tour';
+export const ID_TSP_TOUR_G = 'tsp-tour';
 export const ID_ELEMENT_FORM = 'element-form';
 export const ID_SECTION_G = 'sections';
 export const ID_INTERSECTION_G = 'intersections';
@@ -7,7 +10,7 @@ export const ID_DISPLAY_LAYER_G = 'display-layer';
 export const ID_STORE_SHELVES_G = 'store-shelves';
 
 export const GRID_CLR = '#dbdbdb';
-export const GRID_SIZE = 20;
+export const GRID_SIZE = 10;
 export const GRID_LINE_CONFIG = {'stroke-width': 0.5, 'stroke' : GRID_CLR};
 
 /* Section config */

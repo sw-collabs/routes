@@ -15,7 +15,7 @@
         }
 
         .svg {
-            height: 700px;
+            height: 1000px;
             width: 90%;
             margin: auto;
             border: 1px solid white;
@@ -46,6 +46,10 @@
         <button id="export" class="toolbar-btn" type="button"
                 onclick="Main.ButtonEvents.uiHandleExportClick()">
             Export
+        </button>
+        <button id="toggle" class="toolbar-btn" type="button"
+                onclick="Main.ButtonEvents.uiHandleToggleClick()">
+            Toggle
         </button>
         <input id="import" class="toolbar-btn" type="file" accept="application/json"/>
     </div>

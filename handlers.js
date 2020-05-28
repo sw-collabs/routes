@@ -32,11 +32,11 @@ import {
   STYLE_PATH,
   STYLE_STORE_SHELF_TEXT,
   STYLE_ADJ_DISPLAY,
-  STYLE_SHORTEST_PATH
+  STYLE_SHORTEST_PATH, ID_GRID_LINES, ID_OPT_TSP_TOUR_G, ID_TSP_TOUR_G
 } from './config.js';
-import {__ns, vec, vec3, cross3, rect, line, update, ASSERT_VEC, text} from './gl.js';
+import {__ns, vec, g, vec3, cross3, rect, line, update, ASSERT_VEC, text} from './gl.js';
 import * as gl from './gl.js';
-import {nearestNeighbor} from "./tsp.js";
+import {nearestNeighbor, tourLength, tourPaths, twoOpt, twoOptSwap} from "./tsp.js";
 
 const SECTION = 'section';
 const STORE_SHELF = 'store-shelf';
@@ -102,6 +102,18 @@ export function onStoreShelfClick() {
 
 export function onPathClick() {
   elementType = PATH;
+}
+
+export function onToggleClick() {
+  let optPathElem = document.getElementById(ID_OPT_TSP_TOUR_G);
+  let pathElem = document.getElementById(ID_TSP_TOUR_G);
+  if (optPathElem.getAttribute('visibility') === 'visible') {
+    optPathElem.setAttribute('visibility', 'hidden');
+    pathElem.setAttribute('visibility', 'visible');
+  } else {
+    optPathElem.setAttribute('visibility', 'visible');
+    pathElem.setAttribute('visibility', 'hidden');
+  }
 }
 
 export function onDoneClick() {
@@ -258,8 +270,8 @@ export function onShoppingListSubmit() {
    */
   const list = document.getElementById("shopping-list").value;
   const storeShelves = list.split('\n').map(item => getStoreShelfByName(item));
-  const start = INTERSECTIONS['intersection-54-17'];
-  const end = INTERSECTIONS['intersection-9-34'];
+  const start = INTERSECTIONS['intersection-45-88'];
+  const end = INTERSECTIONS['intersection-4-29'];
 
   // Highlight storeshelves
   {
@@ -272,30 +284,62 @@ export function onShoppingListSubmit() {
   }
 
   let clusters = {};
-  let pathsList = [];
+  let optPathsList = [], pathsList;
   try {
     storeShelves.forEach(storeShelf => {
       let cluster = new Cluster(storeShelf, storeShelves);
       clusters[cluster.id] = cluster;
     });
 
-    pathsList = nearestNeighbor(clusters, start, end);
+    let Tour = nearestNeighbor(clusters, start, end);
+    let optTour = twoOpt(Tour, Infinity, 200);
+    optPathsList = tourPaths(optTour);
+    pathsList = tourPaths(Tour);
+
+    console.log('Nearest Neighbor Distance:', tourLength(Tour));
+    console.log('2-Opt Distance:', tourLength(optTour));
   } catch (e) {
     console.error(e);
     return;
   }
 
-  {
-    for (let paths of pathsList) {
-      // Color in the paths
-      paths.forEach(p => {
-        __ns(
-          document.getElementById(ID_SVG),
-          {},
-          line(p.to, p.from, STYLE_SHORTEST_PATH)
-        );
-      });
+  // remove grids
+  try {
+    document.getElementById(ID_GRID_LINES).remove();
+    {
+      let lines = [];
+      for (let paths of optPathsList) {
+        // Color in the paths
+        paths.forEach(p => {
+          lines.push(line(p.to, p.from, {
+            'stroke': '#e0cf5c',
+            'stroke-width': 4
+          }));
+        });
+      }
+
+      __ns(document.getElementById(ID_SVG), {},
+        g(ID_OPT_TSP_TOUR_G, ...lines)
+      );
     }
+
+    {
+      let lines = [];
+      for (let paths of pathsList) {
+        // Color in the paths
+        paths.forEach(p => {
+          lines.push(line(p.to, p.from, {
+            'stroke': '#cf54ff',
+            'stroke-width': 4
+          }));
+        });
+      }
+      __ns(document.getElementById(ID_SVG), {},
+        g(ID_TSP_TOUR_G, ...lines)
+      );
+    }
+  } catch (e) {
+    console.error(e);
   }
 }
 

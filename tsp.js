@@ -1,8 +1,6 @@
 import dijkstra from "./dijkstra.js";
 import Point from "./tsp/Point.js";
 
-const MAX_MIN_COUNT = 10; // Detect when local minimum is reached for 2-opt
-
 
 export function tourLength(Tour) {
   let length = 0;
@@ -15,6 +13,19 @@ export function tourLength(Tour) {
   }
 
   return length;
+}
+
+export function tourPaths(Tour) {
+  let paths = [];
+
+  let i;
+  for (i=1; i<Tour.length; i++) {
+    let curr = Tour[i].point;
+    let prev = Tour[i-1].point;
+    paths.push(curr.distanceFrom(prev.intersection).paths);
+  }
+
+  return paths;
 }
 
 export function nearestNeighbor(clusters, start, end) {
@@ -94,19 +105,23 @@ export function nearestNeighbor(clusters, start, end) {
     }
   }
 
-  // TODO: trace paths from Tour
-  let paths = [];
   return Tour;
 }
 
-export function twoOpt(Tour, MAX_ITERS) {
+/**
+ * @param Tour: Tour to optimize
+ * @param MIN_COUNT: Used to detect when we've reached local minimum
+ * @param MAX_ITERS: Used to limit number of 2-Opt rounds
+ */
+export function twoOpt(Tour, MIN_COUNT, MAX_ITERS) {
   let iters = 0;
   let minLength = tourLength(Tour);
 
   let minCount = 0;
-  while (minCount < MAX_MIN_COUNT && iters < MAX_ITERS) {
+  while (minCount < MIN_COUNT && iters < MAX_ITERS) {
     let newTour = twoOptSwap(Tour);
     let len = tourLength(newTour);
+    console.log(`Finished 2-Opt[${iters}]: MinTour: ${minLength}, NewTour: ${len}`);
     if (len < minLength) {
       Tour = newTour;
       minLength = len;
@@ -117,6 +132,8 @@ export function twoOpt(Tour, MAX_ITERS) {
 
     iters++;
   }
+
+  return Tour;
 }
 
 /**
@@ -131,10 +148,11 @@ export function twoOptSwap(Tour) {
 
   // 0 ... i, i+1, ..., k, k+1, ..., Tour.length-1
   let i, k;
-  i = Math.floor(Math.random() * (Tour.length - 2)) + 1;
-  k = Math.floor(Math.random() * (Tour.length - i - 2)) + i + 1;
+  i = Math.floor(Math.random() * (Tour.length - 4)) + 1;
+  k = Math.floor(Math.random() * (Tour.length - i - 3)) + i + 1;
+  console.log(`2-Opt: Tour.length=${Tour.length}, i=${i}, k=${k}`);
 
-  // construct new tour
+  // T[0] -> T[i]
   let newTour = [];
   {
     let n;
@@ -143,7 +161,7 @@ export function twoOptSwap(Tour) {
     }
   }
 
-  // i'th cluster to k'th cluster reroute
+  // T[i] -> T[k]
   {
     let {point} = Tour[k].cluster.minFrom(
       newTour[i].point.intersection
@@ -155,10 +173,11 @@ export function twoOptSwap(Tour) {
   }
 
   /*
-   * Reverse Tour and emplace to newTour.
+   * T[k-1] -> T[i+1]: Reverse Tour and emplace to newTour.
    *
    * 'n': index of Tour
    * 'm': index of newTour
+   *
    * Use 'n' to access Tour. Since this is the reverse step,
    * 'n' is decrementing starting at k-1.
    * Use 'm' to access newTour. Starting at this step, index
@@ -190,9 +209,10 @@ export function twoOptSwap(Tour) {
     }
   }
 
+  // T[i+1] -> T[k+1]
   {
     let {point} = Tour[k+1].cluster.minFrom(
-      newTour[newTour.length-1].intersection
+      newTour[newTour.length-1].point.intersection
     );
     newTour.push({
       cluster: Tour[k+1].cluster,
@@ -200,6 +220,7 @@ export function twoOptSwap(Tour) {
     });
   }
 
+  // T[k+1] -> T[length(T)-2]
   {
     let n = k+2;
     let m = newTour.length - 1;

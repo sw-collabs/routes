@@ -8,7 +8,7 @@ import {
   ID_INTERSECTION_G,
   ID_DISPLAY_LAYER_G,
   GRID_LINE_CONFIG,
-  GRID_SIZE
+  GRID_SIZE, ID_GRID_LINES
 } from "./config.js";
 import Queue from "./Queue.js";
 
@@ -21,7 +21,8 @@ const ButtonEvents = {
   uiHandleDoneClick: () => handlers.onDoneClick(),
   uiHandleInfoSubmit: () => handlers.onInfoSubmit(),
   uiHandleExportClick: () => handlers.onExportClick(),
-  uiHandleShoppingListSubmit: () => handlers.onShoppingListSubmit()
+  uiHandleShoppingListSubmit: () => handlers.onShoppingListSubmit(),
+  uiHandleToggleClick: () => handlers.onToggleClick()
 };
 
 const SVGEvents = {
@@ -145,7 +146,7 @@ function testQueue() {
       }
     }
 
-    __ns(SVG, {}, g('grid-lines', ...elems));
+    __ns(SVG, {}, g(ID_GRID_LINES, ...elems));
   };
 
 
