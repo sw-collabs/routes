@@ -38,7 +38,7 @@ export const STYLE_STORE_SHELF_TEXT = {
 
 export const STYLE_PATH = {
   'stroke': '#75968e',
-  'stroke-width': 4
+  'stroke-width': 3
 };
 
 export const STYLE_SHORTEST_PATH = {

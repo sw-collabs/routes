@@ -110,7 +110,7 @@ export function onToggleClick() {
   let pathElem = document.getElementById(ID_TSP_TOUR_G);
   let randPathElem = document.getElementById(ID_RAND_TSP_TOUR_G);
 
-  roundRobin = roundRobin % 3;
+  roundRobin = roundRobin % 4;
 
   switch (roundRobin) {
     case 0:
@@ -129,6 +129,9 @@ export function onToggleClick() {
       randPathElem.setAttribute('visibility', 'visible');
       break;
     default:
+      pathElem.setAttribute('visibility', 'hidden');
+      optPathElem.setAttribute('visibility', 'hidden');
+      randPathElem.setAttribute('visibility', 'hidden');
   }
 
   roundRobin++;

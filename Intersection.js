@@ -5,7 +5,7 @@ import { svgCoordsToGridCoords } from "./lib.js";
 import { INTERSECTIONS, PATHS } from "./handlers.js";
 import { ID_INTERSECTION_G, STYLE_INTERSECTION } from "./config.js";
 
-const SYMBOL_WIDTH_HEIGHT = 5;
+const SYMBOL_WIDTH_HEIGHT = 3;
 const INTERSECTION_ID = coords => `${ObjectSVGConfigs.INTERSECTION_ID}-${coords.x}-${coords.y}`;
 
 
