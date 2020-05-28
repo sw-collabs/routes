@@ -29,7 +29,7 @@ export default class Cluster {
    * Computes the shortest distance path from 'src' to
    * reach any points in this Cluster.
    *
-   * @param src
+   * @param src: Intersection object
    */
   minFrom(src) {
     let min = Infinity;

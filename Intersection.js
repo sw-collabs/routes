@@ -144,4 +144,8 @@ export default class Intersection extends BaseObject {
       document.getElementById(this.id)
     );
   }
+
+  equals(isection) {
+    return gl.EQUALS(isection.point, this.point);
+  }
 }

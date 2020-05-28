@@ -87,10 +87,13 @@ export default class Point {
       this.routes[id1] = route;
     }
 
-    console.log(route);
     return {
       distance: route.distance,
       paths: route.paths
     };
+  }
+
+  equals(point) {
+    return this.intersection.equals(point.intersection);
   }
 }
