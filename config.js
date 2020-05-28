@@ -2,6 +2,7 @@ export const ID_SVG = 'main-svg';
 export const ID_GRID_LINES = 'grid-lines';
 export const ID_OPT_TSP_TOUR_G = 'opt-tsp-tour';
 export const ID_TSP_TOUR_G = 'tsp-tour';
+export const ID_RAND_TSP_TOUR_G = 'rand-tsp-tour';
 export const ID_ELEMENT_FORM = 'element-form';
 export const ID_SECTION_G = 'sections';
 export const ID_INTERSECTION_G = 'intersections';

@@ -32,11 +32,11 @@ import {
   STYLE_PATH,
   STYLE_STORE_SHELF_TEXT,
   STYLE_ADJ_DISPLAY,
-  STYLE_SHORTEST_PATH, ID_GRID_LINES, ID_OPT_TSP_TOUR_G, ID_TSP_TOUR_G
+  STYLE_SHORTEST_PATH, ID_GRID_LINES, ID_OPT_TSP_TOUR_G, ID_TSP_TOUR_G, ID_RAND_TSP_TOUR_G
 } from './config.js';
 import {__ns, vec, g, vec3, cross3, rect, line, update, ASSERT_VEC, text} from './gl.js';
 import * as gl from './gl.js';
-import {nearestNeighbor, tourLength, tourPaths, twoOpt, twoOptSwap} from "./tsp.js";
+import {nearestNeighbor, randomClusters, tourLength, tourPaths, twoOpt, twoOptSwap} from "./tsp.js";
 
 const SECTION = 'section';
 const STORE_SHELF = 'store-shelf';
@@ -104,15 +104,42 @@ export function onPathClick() {
   elementType = PATH;
 }
 
+let roundRobin = 0;
 export function onToggleClick() {
   let optPathElem = document.getElementById(ID_OPT_TSP_TOUR_G);
   let pathElem = document.getElementById(ID_TSP_TOUR_G);
-  if (optPathElem.getAttribute('visibility') === 'visible') {
-    optPathElem.setAttribute('visibility', 'hidden');
-    pathElem.setAttribute('visibility', 'visible');
+  let randPathElem = document.getElementById(ID_RAND_TSP_TOUR_G);
+
+  roundRobin = roundRobin % 3;
+
+  switch (roundRobin) {
+    case 0:
+      pathElem.setAttribute('visibility', 'visible');
+      optPathElem.setAttribute('visibility', 'hidden');
+      randPathElem.setAttribute('visibility', 'hidden');
+      break;
+    case 1:
+      pathElem.setAttribute('visibility', 'hidden');
+      optPathElem.setAttribute('visibility', 'visible');
+      randPathElem.setAttribute('visibility', 'hidden');
+      break;
+    case 2:
+      pathElem.setAttribute('visibility', 'hidden');
+      optPathElem.setAttribute('visibility', 'hidden');
+      randPathElem.setAttribute('visibility', 'visible');
+      break;
+    default:
+  }
+
+  roundRobin++;
+}
+
+export function onToggleGridClick() {
+  let gridElem = document.getElementById(ID_GRID_LINES);
+  if (gridElem.getAttribute('visibility') === 'visible') {
+    gridElem.setAttribute('visibility', 'hidden');
   } else {
-    optPathElem.setAttribute('visibility', 'visible');
-    pathElem.setAttribute('visibility', 'hidden');
+    gridElem.setAttribute('visibility', 'visible');
   }
 }
 
@@ -284,7 +311,9 @@ export function onShoppingListSubmit() {
   }
 
   let clusters = {};
-  let optPathsList = [], pathsList;
+  let optPathsList = [];
+  let pathsList = [];
+  let randPathsList = [];
   try {
     storeShelves.forEach(storeShelf => {
       let cluster = new Cluster(storeShelf, storeShelves);
@@ -292,10 +321,13 @@ export function onShoppingListSubmit() {
     });
 
     let Tour = nearestNeighbor(clusters, start, end);
-    let optTour = twoOpt(Tour, Infinity, 200);
+    let randTour = randomClusters(clusters, start, end);
+    let optTour = twoOpt(randTour, Infinity, 200);
     optPathsList = tourPaths(optTour);
     pathsList = tourPaths(Tour);
+    randPathsList = tourPaths(randTour);
 
+    console.log('Random Distance:', tourLength(randTour));
     console.log('Nearest Neighbor Distance:', tourLength(Tour));
     console.log('2-Opt Distance:', tourLength(optTour));
   } catch (e) {
@@ -305,7 +337,6 @@ export function onShoppingListSubmit() {
 
   // remove grids
   try {
-    document.getElementById(ID_GRID_LINES).remove();
     {
       let lines = [];
       for (let paths of optPathsList) {
@@ -320,6 +351,23 @@ export function onShoppingListSubmit() {
 
       __ns(document.getElementById(ID_SVG), {},
         g(ID_OPT_TSP_TOUR_G, ...lines)
+      );
+    }
+
+    {
+      let lines = [];
+      for (let paths of randPathsList) {
+        // Color in the paths
+        paths.forEach(p => {
+          lines.push(line(p.to, p.from, {
+            'stroke': 'red',
+            'stroke-width': 4
+          }));
+        });
+      }
+
+      __ns(document.getElementById(ID_SVG), {},
+        g(ID_RAND_TSP_TOUR_G, ...lines)
       );
     }
 

@@ -22,7 +22,8 @@ const ButtonEvents = {
   uiHandleInfoSubmit: () => handlers.onInfoSubmit(),
   uiHandleExportClick: () => handlers.onExportClick(),
   uiHandleShoppingListSubmit: () => handlers.onShoppingListSubmit(),
-  uiHandleToggleClick: () => handlers.onToggleClick()
+  uiHandleToggleClick: () => handlers.onToggleClick(),
+  uiHandleToggleGridClick: () => handlers.onToggleGridClick()
 };
 
 const SVGEvents = {

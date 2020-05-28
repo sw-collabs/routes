@@ -28,6 +28,32 @@ export function tourPaths(Tour) {
   return paths;
 }
 
+export function randomClusters(clusters, start, end) {
+  let Tour = [];
+
+  Tour.push({
+    cluster: null,
+    point: new Point(start, [])
+  });
+
+  Object.values(clusters).forEach(cluster => {
+    let points = cluster.points;
+    let numPoints = Object.keys(points).length;
+    let rand = Math.floor(Math.random() * numPoints);
+    Tour.push({
+      cluster,
+      point: Object.values(points)[rand]
+    });
+  });
+
+  Tour.push({
+    cluster: null,
+    point: new Point(end, [])
+  });
+
+  return Tour;
+}
+
 export function nearestNeighbor(clusters, start, end) {
   /*
    * From start, visit each cluster at most once and
@@ -121,7 +147,7 @@ export function twoOpt(Tour, MIN_COUNT, MAX_ITERS) {
   while (minCount < MIN_COUNT && iters < MAX_ITERS) {
     let newTour = twoOptSwap(Tour);
     let len = tourLength(newTour);
-    console.log(`Finished 2-Opt[${iters}]: MinTour: ${minLength}, NewTour: ${len}`);
+    console.log(`2-Opt[${iters}]: Min: ${minLength}, New: ${len}`);
     if (len < minLength) {
       Tour = newTour;
       minLength = len;
