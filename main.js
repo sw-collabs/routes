@@ -87,7 +87,6 @@ function testQueue() {
      */
     for (let [k, v] of Object.entries(SVGEvents)) {
       v.forEach(handler => {
-        console.log(k, handler);
         SVG.addEventListener(k, handler);
       });
     }

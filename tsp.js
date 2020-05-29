@@ -282,33 +282,45 @@ export function twoOptSwap(Tour, i, k) {
   return newTour;
 }
 
-export function simulatedAnnealing(Tour, temp, tempDelta) {
+export function simulatedAnnealing(Tour, temp,
+                                   coolingFactor,
+                                   equilibriumThreshold) {
   let WinnerTour = Tour;
   let CurrTour = Tour;
-  let tourLength = Tour.length;
 
   let CurrTourLen = tourLength(Tour);
   let WinnerTourLen = CurrTourLen;
 
-  while (temp >= 0) {
-    let isEquilibium = false;
-    while (!isEquilibium) {
-      let {i, k} = genTwoOptIndices(tourLength);
+  while (temp >= 0.2) {
+    console.log(`Temp:${temp}, S*=${WinnerTourLen}, S=${CurrTourLen}`);
+    let iters = 0;
+    while (iters < equilibriumThreshold) {
+      let {i, k} = genTwoOptIndices(CurrTour.length);
       let NewTour = twoOptSwap(CurrTour, i, k);
 
       let NewTourLen = tourLength(NewTour);
-      if (NewTourLen < WinnerTourLen) {
-        WinnerTour = NewTour;
-        WinnerTourLen = NewTourLen;
-      }
-
-      let delta = NewTourLen - CurrTourLen;
-      if (delta < 0) {
+      let DELTA = NewTourLen - CurrTourLen;
+      if (DELTA <= 0) {
         CurrTour = NewTour;
         CurrTourLen = NewTourLen;
+
+        if (NewTourLen < WinnerTourLen) {
+          WinnerTour = NewTour;
+          WinnerTourLen = NewTourLen;
+        }
       } else {
-        // TODO
+        let r = Math.random();
+        if (r < Math.pow(Math.E, -DELTA/temp)) {
+          CurrTour = NewTour;
+          CurrTourLen = NewTourLen;
+        }
       }
+
+      iters++;
     }
+
+    temp *= coolingFactor;
   }
+
+  return WinnerTour;
 }

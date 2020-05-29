@@ -32,11 +32,30 @@ import {
   STYLE_PATH,
   STYLE_STORE_SHELF_TEXT,
   STYLE_ADJ_DISPLAY,
-  STYLE_SHORTEST_PATH, ID_GRID_LINES, ID_OPT_TSP_TOUR_G, ID_TSP_TOUR_G, ID_RAND_TSP_TOUR_G, ID_PATH_RESULTS_DIV
+  STYLE_SHORTEST_PATH,
+  ID_GRID_LINES,
+  ID_OPT_TSP_TOUR_G,
+  ID_TSP_TOUR_G,
+  ID_RAND_TSP_TOUR_G,
+  ID_PATH_RESULTS_DIV,
+  ID_SA_TSP_TOUR_G
 } from './config.js';
-import {__ns, vec, g, vec3, cross3, rect, line, update, ASSERT_VEC, text, circle, __rm} from './gl.js';
+import {
+  __ns, vec, div, g,
+  vec3, cross3, rect,
+  line, update,
+  ASSERT_VEC, text,
+  circle, __rm, CSS
+} from './gl.js';
 import * as gl from './gl.js';
-import {nearestNeighbor, randomClusters, tourLength, tourPaths, twoOpt, twoOptSwap} from "./tsp.js";
+import {
+  nearestNeighbor,
+  randomClusters,
+  simulatedAnnealing,
+  tourLength,
+  tourPaths,
+  twoOpt
+} from "./tsp.js";
 
 const SECTION = 'section';
 const STORE_SHELF = 'store-shelf';
@@ -109,29 +128,40 @@ export function onToggleClick() {
   let optPathElem = document.getElementById(ID_OPT_TSP_TOUR_G);
   let pathElem = document.getElementById(ID_TSP_TOUR_G);
   let randPathElem = document.getElementById(ID_RAND_TSP_TOUR_G);
+  let saPathElem = document.getElementById(ID_SA_TSP_TOUR_G);
 
-  roundRobin = roundRobin % 4;
+  roundRobin = roundRobin % 5;
 
   switch (roundRobin) {
     case 0:
       pathElem.setAttribute('visibility', 'visible');
       optPathElem.setAttribute('visibility', 'hidden');
       randPathElem.setAttribute('visibility', 'hidden');
+      saPathElem.setAttribute('visibility', 'hidden');
       break;
     case 1:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'visible');
       randPathElem.setAttribute('visibility', 'hidden');
+      saPathElem.setAttribute('visibility', 'hidden');
       break;
     case 2:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'hidden');
       randPathElem.setAttribute('visibility', 'visible');
+      saPathElem.setAttribute('visibility', 'hidden');
+      break;
+    case 3:
+      pathElem.setAttribute('visibility', 'hidden');
+      optPathElem.setAttribute('visibility', 'hidden');
+      randPathElem.setAttribute('visibility', 'hidden');
+      saPathElem.setAttribute('visibility', 'visible');
       break;
     default:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'hidden');
       randPathElem.setAttribute('visibility', 'hidden');
+      saPathElem.setAttribute('visibility', 'hidden');
   }
 
   roundRobin++;
@@ -166,7 +196,6 @@ export function onDoneClick() {
       }
     });
   });
-  console.log(INTERSECTIONS);
 }
 
 /**
@@ -220,23 +249,13 @@ export function onImportClick() {
   FILE.text().then(text => {
     const json = JSON.parse(text);
 
-    // StoreShelf (pt 1)
     json.STORE_SHELVES.forEach(storeShelf => importStoreShelf(storeShelf));
-
-    // Path
     json.PATHS.forEach(path => importPath(path));
-
-    // Intersection
     json.INTERSECTIONS.forEach(isection => importIntersection(isection));
-
-    // StoreShelf (pt 2)
     json.STORE_SHELVES.forEach(storeShelf => importStoreShelf(storeShelf));
-
-    // Section
     json.SECTIONS.forEach(section => importSection(section));
 
     onDoneClick();
-    console.log(INTERSECTIONS);
   });
 
 }
@@ -291,10 +310,11 @@ export function onInfoSubmit() {
 }
 
 export function onShoppingListSubmit() {
-  document.getElementById(ID_PATH_RESULTS_DIV).innerText = '';
+  document.getElementById(ID_PATH_RESULTS_DIV).innerHTML = '';
   __rm(ID_RAND_TSP_TOUR_G);
   __rm(ID_OPT_TSP_TOUR_G);
   __rm(ID_TSP_TOUR_G);
+  __rm(ID_SA_TSP_TOUR_G);
   // Highlight storeshelves
   {
     try {
@@ -328,7 +348,7 @@ export function onShoppingListSubmit() {
   }
 
   let clusters = {};
-  let Tour, randTour, optTour;
+  let Tour, randTour, optTour, annealedTour;
   try {
     storeShelves.forEach(storeShelf => {
       let cluster = new Cluster(storeShelf, storeShelves);
@@ -337,22 +357,37 @@ export function onShoppingListSubmit() {
 
     Tour = nearestNeighbor(clusters, start, end);
     randTour = randomClusters(clusters, start, end);
-    optTour = twoOpt(Tour, Infinity, 1000);
+    optTour = twoOpt(Tour, Infinity, 10000);
+    annealedTour = simulatedAnnealing(Tour, 300, 0.95, 1000);
   } catch (e) {
     console.error(e);
     return;
   }
 
-  const visualize = (description, T, ID, config) => {
+  const visualize = (description, T, ID, color) => {
     let pathsList = tourPaths(T);
     let length = tourLength(T);
-    let div = document.getElementById(ID_PATH_RESULTS_DIV);
-    div.innerText = `${div.innerText}, ${description}: ${length}`;
+    __ns(document.getElementById(ID_PATH_RESULTS_DIV), {},
+      div(`${ID}-div`, `${description}: ${length}`, {
+        style: CSS({
+          'padding': '5px 10px 5px 10px',
+          'color': 'black',
+          'font-family': 'Helvetica',
+          'font-weight': 'bold',
+          'background-color': color,
+          'display': 'inline-block',
+          'align': 'left'
+        })
+      })
+    );
 
     let lines = [];
     for (let paths of pathsList) {
       paths.forEach(path => lines.push(
-        line(path.to, path.from, config)
+        line(path.to, path.from, {
+          'stroke-width': 4,
+          'stroke': color
+        })
       ));
     }
 
@@ -376,18 +411,10 @@ export function onShoppingListSubmit() {
       g(ID, ...lines, ...circles));
   };
 
-  visualize('Nearest Neighbor', Tour, ID_TSP_TOUR_G, {
-    'stroke': '#cf54ff',
-    'stroke-width': 4
-  });
-  visualize('2-Opt', optTour, ID_OPT_TSP_TOUR_G, {
-    'stroke': '#e0cf5c',
-    'stroke-width': 4
-  });
-  visualize('Random', randTour, ID_RAND_TSP_TOUR_G, {
-    'stroke': 'red',
-    'stroke-width': 4
-  });
+  visualize('Nearest Neighbor', Tour, ID_TSP_TOUR_G, '#cf54ff');
+  visualize('2-Opt', optTour, ID_OPT_TSP_TOUR_G, '#e0cf5c');
+  visualize('Simulated Annealing', annealedTour, ID_SA_TSP_TOUR_G, '#79e095');
+  visualize('Random', randTour, ID_RAND_TSP_TOUR_G, 'red');
 }
 
 export const PathHandlers = {

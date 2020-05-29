@@ -11,6 +11,7 @@ export const SCALAR_MULT = (s, v) => vec(s*v.x, s*v.y);
 export const EQUALS = (v1, v2) => v1.x === v2.x && v1.y === v2.y;
 export const LEQUALS = (v1, v2) => v1.x <= v2.x && v1.y <= v2.y;
 export const VEC_STR = v => `${v.x}-${v.y}`;
+export const CSS = json => Object.entries(json).reduce((acc, [k, v]) => `${acc} ${k}: ${v};`, '');
 
 export function mat2(a11, a12, a21, a22) {
   /*
@@ -88,6 +89,16 @@ export function circle(vec, r, config={}) {
     cx: vec.x,
     cy: vec.y,
     r
+  });
+}
+
+export function div(id, innerHTML, config={}) {
+  const div = document.createElement('div');
+  div.innerHTML = innerHTML;
+
+  return __ns(div, {
+    ...config,
+    id
   });
 }
 
