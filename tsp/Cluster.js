@@ -12,7 +12,8 @@ export default class Cluster {
    * @param allStoreShelves:  []
    */
   constructor(storeShelf, allStoreShelves=[]) {
-    this.id = CLUSTER_ID(svgCoordsToGridCoords(storeShelf.center()));
+    this.id = `cluster-${storeShelf.name}`;
+    // CLUSTER_ID(svgCoordsToGridCoords(storeShelf.name));
     this.points = {};
 
     let otherShelves = allStoreShelves.filter(

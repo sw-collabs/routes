@@ -300,8 +300,8 @@ export function onShoppingListSubmit() {
    */
   const list = document.getElementById("shopping-list").value;
   const storeShelves = list.split('\n').map(item => getStoreShelfByName(item));
-  const start = INTERSECTIONS['intersection-45-88'];
-  const end = INTERSECTIONS['intersection-4-29'];
+  const start = INTERSECTIONS['intersection-8-5'];
+  const end = INTERSECTIONS['intersection-62-5'];
 
   // Highlight storeshelves
   {
@@ -325,7 +325,7 @@ export function onShoppingListSubmit() {
 
     let Tour = nearestNeighbor(clusters, start, end);
     let randTour = randomClusters(clusters, start, end);
-    let optTour = twoOpt(randTour, Infinity, 200);
+    let optTour = twoOpt(Tour, Infinity, 10000);
     optPathsList = tourPaths(optTour);
     pathsList = tourPaths(Tour);
     randPathsList = tourPaths(randTour);

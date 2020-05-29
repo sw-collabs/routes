@@ -176,7 +176,6 @@ export function twoOptSwap(Tour) {
   let i, k;
   i = Math.floor(Math.random() * (Tour.length - 4)) + 1;
   k = Math.floor(Math.random() * (Tour.length - i - 3)) + i + 1;
-  console.log(`2-Opt: Tour.length=${Tour.length}, i=${i}, k=${k}`);
 
   // T[0] -> T[i]
   let newTour = [];
