@@ -136,26 +136,26 @@ export function onToggleClick() {
     case 0:
       pathElem.setAttribute('visibility', 'visible');
       optPathElem.setAttribute('visibility', 'hidden');
-      randPathElem.setAttribute('visibility', 'hidden');
       saPathElem.setAttribute('visibility', 'hidden');
+      randPathElem.setAttribute('visibility', 'hidden');
       break;
     case 1:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'visible');
-      randPathElem.setAttribute('visibility', 'hidden');
       saPathElem.setAttribute('visibility', 'hidden');
+      randPathElem.setAttribute('visibility', 'hidden');
       break;
     case 2:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'hidden');
-      randPathElem.setAttribute('visibility', 'visible');
-      saPathElem.setAttribute('visibility', 'hidden');
+      saPathElem.setAttribute('visibility', 'visible');
+      randPathElem.setAttribute('visibility', 'hidden');
       break;
     case 3:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'hidden');
-      randPathElem.setAttribute('visibility', 'hidden');
-      saPathElem.setAttribute('visibility', 'visible');
+      saPathElem.setAttribute('visibility', 'hidden');
+      randPathElem.setAttribute('visibility', 'visible');
       break;
     default:
       pathElem.setAttribute('visibility', 'hidden');
@@ -315,7 +315,6 @@ export function onShoppingListSubmit() {
   __rm(ID_OPT_TSP_TOUR_G);
   __rm(ID_TSP_TOUR_G);
   __rm(ID_SA_TSP_TOUR_G);
-  // Highlight storeshelves
   {
     try {
       Object.values(STORE_SHELVES).forEach(shelf =>
@@ -357,7 +356,7 @@ export function onShoppingListSubmit() {
 
     Tour = nearestNeighbor(clusters, start, end);
     randTour = randomClusters(clusters, start, end);
-    optTour = twoOpt(Tour, Infinity, 10000);
+    optTour = twoOpt(Tour, Infinity, 1000);
     annealedTour = simulatedAnnealing(Tour, 300, 0.95, 1000);
   } catch (e) {
     console.error(e);
