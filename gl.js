@@ -65,6 +65,13 @@ export function __ns(elem, config={}, ...children) {
   return elem;
 }
 
+export function __rm(ELEM_ID) {
+  let elem = document.getElementById(ELEM_ID);
+  if (elem !== undefined && elem !== null) {
+    elem.remove();
+  }
+}
+
 export function vec(x, y) {
   return {x, y};
 }

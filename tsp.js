@@ -134,29 +134,50 @@ export function nearestNeighbor(clusters, start, end) {
   return Tour;
 }
 
+function genTwoOptIndices(tourLength) {
+  let i = Math.floor(Math.random()*(tourLength-4))+1;
+  let k = Math.floor(Math.random()*(tourLength-i-3))+i+1;
+
+  return {i, k};
+}
+
 /**
  * @param Tour: Tour to optimize
  * @param MIN_COUNT: Used to detect when we've reached local minimum
  * @param MAX_ITERS: Used to limit number of 2-Opt rounds
  */
 export function twoOpt(Tour, MIN_COUNT, MAX_ITERS) {
+  // No point in optimizing trivially small tours
+  if (Tour.length <= 3) {
+    return Tour;
+  }
+
   let iters = 0;
   let minLength = tourLength(Tour);
 
+  let i, k
+  let prev_i = -1, prev_k = -1;
   let minCount = 0;
   while (minCount < MIN_COUNT && iters < MAX_ITERS) {
-    let newTour = twoOptSwap(Tour);
-    let len = tourLength(newTour);
-    console.log(`2-Opt[${iters}]: Min: ${minLength}, New: ${len}`);
-    if (len < minLength) {
-      Tour = newTour;
-      minLength = len;
-      minCount = 0; // reset minCount
-    } else {
-      minCount++;
-    }
+    // 0 ... i, i+1, ..., k, k+1, ..., Tour.length-1
+    ({i, k} = genTwoOptIndices(Tour.length));
 
-    iters++;
+    if (i !== prev_i && k !== prev_k) {
+      let newTour = twoOptSwap(Tour, i, k);
+      let len = tourLength(newTour);
+      console.log(`2-Opt[${iters}]: Min: ${minLength}, New: ${len}`);
+      if (len < minLength) {
+        Tour = newTour;
+        minLength = len;
+        minCount = 0; // reset minCount
+      } else {
+        minCount++;
+      }
+
+      prev_i = i;
+      prev_k = k;
+      iters++;
+    }
   }
 
   return Tour;
@@ -166,17 +187,7 @@ export function twoOpt(Tour, MIN_COUNT, MAX_ITERS) {
  * Returns new Tour after a single round of 2-opt
  * @param Tour
  */
-export function twoOptSwap(Tour) {
-  // No point in optimizing trivially small tours
-  if (Tour.length <= 3) {
-    return Tour;
-  }
-
-  // 0 ... i, i+1, ..., k, k+1, ..., Tour.length-1
-  let i, k;
-  i = Math.floor(Math.random() * (Tour.length - 4)) + 1;
-  k = Math.floor(Math.random() * (Tour.length - i - 3)) + i + 1;
-
+export function twoOptSwap(Tour, i, k) {
   // T[0] -> T[i]
   let newTour = [];
   {
@@ -269,4 +280,35 @@ export function twoOptSwap(Tour) {
   // Finally, push end
   newTour.push(Tour[Tour.length-1]);
   return newTour;
+}
+
+export function simulatedAnnealing(Tour, temp, tempDelta) {
+  let WinnerTour = Tour;
+  let CurrTour = Tour;
+  let tourLength = Tour.length;
+
+  let CurrTourLen = tourLength(Tour);
+  let WinnerTourLen = CurrTourLen;
+
+  while (temp >= 0) {
+    let isEquilibium = false;
+    while (!isEquilibium) {
+      let {i, k} = genTwoOptIndices(tourLength);
+      let NewTour = twoOptSwap(CurrTour, i, k);
+
+      let NewTourLen = tourLength(NewTour);
+      if (NewTourLen < WinnerTourLen) {
+        WinnerTour = NewTour;
+        WinnerTourLen = NewTourLen;
+      }
+
+      let delta = NewTourLen - CurrTourLen;
+      if (delta < 0) {
+        CurrTour = NewTour;
+        CurrTourLen = NewTourLen;
+      } else {
+        // TODO
+      }
+    }
+  }
 }

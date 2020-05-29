@@ -32,9 +32,9 @@ import {
   STYLE_PATH,
   STYLE_STORE_SHELF_TEXT,
   STYLE_ADJ_DISPLAY,
-  STYLE_SHORTEST_PATH, ID_GRID_LINES, ID_OPT_TSP_TOUR_G, ID_TSP_TOUR_G, ID_RAND_TSP_TOUR_G
+  STYLE_SHORTEST_PATH, ID_GRID_LINES, ID_OPT_TSP_TOUR_G, ID_TSP_TOUR_G, ID_RAND_TSP_TOUR_G, ID_PATH_RESULTS_DIV
 } from './config.js';
-import {__ns, vec, g, vec3, cross3, rect, line, update, ASSERT_VEC, text} from './gl.js';
+import {__ns, vec, g, vec3, cross3, rect, line, update, ASSERT_VEC, text, circle, __rm} from './gl.js';
 import * as gl from './gl.js';
 import {nearestNeighbor, randomClusters, tourLength, tourPaths, twoOpt, twoOptSwap} from "./tsp.js";
 
@@ -139,10 +139,10 @@ export function onToggleClick() {
 
 export function onToggleGridClick() {
   let gridElem = document.getElementById(ID_GRID_LINES);
-  if (gridElem.getAttribute('visibility') === 'visible') {
-    gridElem.setAttribute('visibility', 'hidden');
-  } else {
+  if (gridElem.getAttribute('visibility') === 'hidden') {
     gridElem.setAttribute('visibility', 'visible');
+  } else {
+    gridElem.setAttribute('visibility', 'hidden');
   }
 }
 
@@ -291,6 +291,20 @@ export function onInfoSubmit() {
 }
 
 export function onShoppingListSubmit() {
+  document.getElementById(ID_PATH_RESULTS_DIV).innerText = '';
+  __rm(ID_RAND_TSP_TOUR_G);
+  __rm(ID_OPT_TSP_TOUR_G);
+  __rm(ID_TSP_TOUR_G);
+  // Highlight storeshelves
+  {
+    try {
+      Object.values(STORE_SHELVES).forEach(shelf =>
+        shelf.update(STYLE_STORE_SHELF));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   /*
    * 1. Get shopping list from form field
    * 2. For now -- perform dijkstra to find the shortest
@@ -314,84 +328,66 @@ export function onShoppingListSubmit() {
   }
 
   let clusters = {};
-  let optPathsList = [];
-  let pathsList = [];
-  let randPathsList = [];
+  let Tour, randTour, optTour;
   try {
     storeShelves.forEach(storeShelf => {
       let cluster = new Cluster(storeShelf, storeShelves);
       clusters[cluster.id] = cluster;
     });
 
-    let Tour = nearestNeighbor(clusters, start, end);
-    let randTour = randomClusters(clusters, start, end);
-    let optTour = twoOpt(Tour, Infinity, 10000);
-    optPathsList = tourPaths(optTour);
-    pathsList = tourPaths(Tour);
-    randPathsList = tourPaths(randTour);
-
-    console.log('Random Distance:', tourLength(randTour));
-    console.log('Nearest Neighbor Distance:', tourLength(Tour));
-    console.log('2-Opt Distance:', tourLength(optTour));
+    Tour = nearestNeighbor(clusters, start, end);
+    randTour = randomClusters(clusters, start, end);
+    optTour = twoOpt(Tour, Infinity, 1000);
   } catch (e) {
     console.error(e);
     return;
   }
 
-  // remove grids
-  try {
-    {
-      let lines = [];
-      for (let paths of optPathsList) {
-        // Color in the paths
-        paths.forEach(p => {
-          lines.push(line(p.to, p.from, {
-            'stroke': '#e0cf5c',
-            'stroke-width': 4
-          }));
-        });
-      }
+  const visualize = (description, T, ID, config) => {
+    let pathsList = tourPaths(T);
+    let length = tourLength(T);
+    let div = document.getElementById(ID_PATH_RESULTS_DIV);
+    div.innerText = `${div.innerText}, ${description}: ${length}`;
 
-      __ns(document.getElementById(ID_SVG), {},
-        g(ID_OPT_TSP_TOUR_G, ...lines)
-      );
+    let lines = [];
+    for (let paths of pathsList) {
+      paths.forEach(path => lines.push(
+        line(path.to, path.from, config)
+      ));
     }
 
-    {
-      let lines = [];
-      for (let paths of randPathsList) {
-        // Color in the paths
-        paths.forEach(p => {
-          lines.push(line(p.to, p.from, {
-            'stroke': 'red',
-            'stroke-width': 4
-          }));
-        });
-      }
+    let circles = [];
+    for (let i=1; i<T.length-1; i++) {
+      let cluster = T[i].cluster;
+      let center = gl.SUB(cluster.storeShelf.center(), vec(15,0));
 
-      __ns(document.getElementById(ID_SVG), {},
-        g(ID_RAND_TSP_TOUR_G, ...lines)
-      );
+      circles.push(circle(center, 7, {
+        'fill': 'white',
+        'stroke': 'black'
+      }));
+      circles.push(text(gl.SUB(center, vec(3,-2)), `${i}`, {
+        'stroke': 'black',
+        'font-family': 'Helvetica',
+        'font-size': '8'
+      }));
     }
 
-    {
-      let lines = [];
-      for (let paths of pathsList) {
-        // Color in the paths
-        paths.forEach(p => {
-          lines.push(line(p.to, p.from, {
-            'stroke': '#cf54ff',
-            'stroke-width': 4
-          }));
-        });
-      }
-      __ns(document.getElementById(ID_SVG), {},
-        g(ID_TSP_TOUR_G, ...lines)
-      );
-    }
-  } catch (e) {
-    console.error(e);
-  }
+    __ns(document.getElementById(ID_SVG), {},
+      g(ID, ...lines, ...circles));
+  };
+
+  visualize('Nearest Neighbor', Tour, ID_TSP_TOUR_G, {
+    'stroke': '#cf54ff',
+    'stroke-width': 4
+  });
+  visualize('2-Opt', optTour, ID_OPT_TSP_TOUR_G, {
+    'stroke': '#e0cf5c',
+    'stroke-width': 4
+  });
+  visualize('Random', randTour, ID_RAND_TSP_TOUR_G, {
+    'stroke': 'red',
+    'stroke-width': 4
+  });
 }
 
 export const PathHandlers = {

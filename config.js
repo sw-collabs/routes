@@ -9,6 +9,7 @@ export const ID_INTERSECTION_G = 'intersections';
 export const ID_PATH_G = 'paths';
 export const ID_DISPLAY_LAYER_G = 'display-layer';
 export const ID_STORE_SHELVES_G = 'store-shelves';
+export const ID_PATH_RESULTS_DIV = 'path-results';
 
 export const GRID_CLR = '#dbdbdb';
 export const GRID_SIZE = 10;
