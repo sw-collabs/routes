@@ -49,6 +49,7 @@ import {
 } from './gl.js';
 import * as gl from './gl.js';
 import {
+  heldKarp,
   nearestNeighbor,
   randomClusters,
   simulatedAnnealing,
@@ -348,6 +349,7 @@ export function onShoppingListSubmit() {
 
   let clusters = {};
   let Tour, randTour, optTour, annealedTour;
+  let minD;
   try {
     storeShelves.forEach(storeShelf => {
       let cluster = new Cluster(storeShelf, storeShelves);
@@ -358,6 +360,8 @@ export function onShoppingListSubmit() {
     randTour = randomClusters(clusters, start, end);
     optTour = twoOpt(Tour, Infinity, 1000);
     annealedTour = simulatedAnnealing(Tour, 300, 0.95, 1000);
+    minD = heldKarp(clusters, start, end);
+    console.log(minD);
   } catch (e) {
     console.error(e);
     return;

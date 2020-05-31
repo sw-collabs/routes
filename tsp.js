@@ -324,3 +324,74 @@ export function simulatedAnnealing(Tour, temp,
 
   return WinnerTour;
 }
+
+export function heldKarp(clusters, start, end) {
+  /*
+   * Hard-code: To avoid complications only use first intersection
+   * for each cluster.
+   *
+   * Change up clusters a bit: from Object to Array (ok.. a lot)
+   */
+  clusters = Object.values(clusters).map(cluster => Object.values(cluster.points)[0]);
+  clusters.unshift(new Point(start, []));
+  clusters.push(new Point(end, []));
+
+  const distance = (k, v) => {
+    let K = clusters[k];
+    let V = clusters[v];
+
+    return K.distanceFrom(V.intersection).distance;
+  }
+
+  let M = {};
+  const memoize = (S, c, d) => {
+    let key = `(${S.join('-')})-${S[c]}`;
+    M[key] = d;
+  }
+
+  const get = (S, c) => {
+    let key = `(${S.join('-')})-${S[c]}`;
+    return M[key];
+  }
+
+  /*
+   * S: a set of cities (indices into 'clusters')
+   * c: a city (an index into S)
+   *
+   * Visit each city in S from start, then end
+   * in city 'c'.
+   *
+   * Returns shortest distance.
+   */
+  const D = (S, c) => {
+    {
+      let mem = get(S, c);
+      if (mem !== undefined) {
+        return mem;
+      }
+    }
+
+    let min = Infinity;
+    if (S.length === 1) {
+      min = distance(S[c], clusters.length-1);
+      memoize(S, c, min);
+      return min;
+    }
+
+    let S_ = S.filter((s, i) => c !== i);
+    let x;
+    for (x=0; x<S_.length; x++) {
+      let d = D(S_, x) + distance(S_[x], S[c]);
+      if (d < min) {
+        min = d;
+      }
+    }
+
+    memoize(S, c, min);
+    return min;
+  };
+
+  let _S = [...Array(clusters.length).keys()];
+  _S.pop();
+  return D(_S, 0);
+}
