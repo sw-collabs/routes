@@ -38,7 +38,7 @@ import {
   ID_TSP_TOUR_G,
   ID_RAND_TSP_TOUR_G,
   ID_PATH_RESULTS_DIV,
-  ID_SA_TSP_TOUR_G
+  ID_SA_TSP_TOUR_G, ID_HK_TSP_TOUR_G
 } from './config.js';
 import {
   __ns, vec, div, g,
@@ -130,8 +130,9 @@ export function onToggleClick() {
   let pathElem = document.getElementById(ID_TSP_TOUR_G);
   let randPathElem = document.getElementById(ID_RAND_TSP_TOUR_G);
   let saPathElem = document.getElementById(ID_SA_TSP_TOUR_G);
+  let hkPathElem = document.getElementById(ID_HK_TSP_TOUR_G);
 
-  roundRobin = roundRobin % 5;
+  roundRobin = roundRobin % 6;
 
   switch (roundRobin) {
     case 0:
@@ -139,30 +140,42 @@ export function onToggleClick() {
       optPathElem.setAttribute('visibility', 'hidden');
       saPathElem.setAttribute('visibility', 'hidden');
       randPathElem.setAttribute('visibility', 'hidden');
+      hkPathElem.setAttribute('visibility', 'hidden');
       break;
     case 1:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'visible');
       saPathElem.setAttribute('visibility', 'hidden');
       randPathElem.setAttribute('visibility', 'hidden');
+      hkPathElem.setAttribute('visibility', 'hidden');
       break;
     case 2:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'hidden');
       saPathElem.setAttribute('visibility', 'visible');
       randPathElem.setAttribute('visibility', 'hidden');
+      hkPathElem.setAttribute('visibility', 'hidden');
       break;
     case 3:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'hidden');
       saPathElem.setAttribute('visibility', 'hidden');
       randPathElem.setAttribute('visibility', 'visible');
+      hkPathElem.setAttribute('visibility', 'hidden');
+      break;
+    case 4:
+      pathElem.setAttribute('visibility', 'hidden');
+      optPathElem.setAttribute('visibility', 'hidden');
+      saPathElem.setAttribute('visibility', 'hidden');
+      randPathElem.setAttribute('visibility', 'hidden');
+      hkPathElem.setAttribute('visibility', 'visible');
       break;
     default:
       pathElem.setAttribute('visibility', 'hidden');
       optPathElem.setAttribute('visibility', 'hidden');
       randPathElem.setAttribute('visibility', 'hidden');
       saPathElem.setAttribute('visibility', 'hidden');
+      hkPathElem.setAttribute('visibility', 'hidden');
   }
 
   roundRobin++;
@@ -316,6 +329,7 @@ export function onShoppingListSubmit() {
   __rm(ID_OPT_TSP_TOUR_G);
   __rm(ID_TSP_TOUR_G);
   __rm(ID_SA_TSP_TOUR_G);
+  __rm(ID_HK_TSP_TOUR_G);
   {
     try {
       Object.values(STORE_SHELVES).forEach(shelf =>
@@ -348,20 +362,25 @@ export function onShoppingListSubmit() {
   }
 
   let clusters = {};
-  let Tour, randTour, optTour, annealedTour;
-  let minD;
+  let Tour, randTour, optTour, annealedTour, exactTour;
   try {
     storeShelves.forEach(storeShelf => {
       let cluster = new Cluster(storeShelf, storeShelves);
       clusters[cluster.id] = cluster;
     });
 
+    let clusterLen = Object.keys(clusters).length;
+
     Tour = nearestNeighbor(clusters, start, end);
     randTour = randomClusters(clusters, start, end);
     optTour = twoOpt(Tour, Infinity, 1000);
     annealedTour = simulatedAnnealing(Tour, 300, 0.95, 1000);
-    minD = heldKarp(clusters, start, end);
-    console.log(minD);
+
+    if (clusterLen <= 8) {
+      exactTour = heldKarp(clusters, start, end);
+    } else {
+      exactTour = [];
+    }
   } catch (e) {
     console.error(e);
     return;
@@ -395,15 +414,15 @@ export function onShoppingListSubmit() {
     }
 
     let circles = [];
-    for (let i=1; i<T.length-1; i++) {
+    for (let i = 1; i < T.length - 1; i++) {
       let cluster = T[i].cluster;
-      let center = gl.SUB(cluster.storeShelf.center(), vec(15,0));
+      let center = gl.SUB(cluster.storeShelf.center(), vec(15, 0));
 
       circles.push(circle(center, 7, {
         'fill': 'white',
         'stroke': 'black'
       }));
-      circles.push(text(gl.SUB(center, vec(3,-2)), `${i}`, {
+      circles.push(text(gl.SUB(center, vec(3, -2)), `${i}`, {
         'stroke': 'black',
         'font-family': 'Helvetica',
         'font-size': '8'
@@ -418,6 +437,7 @@ export function onShoppingListSubmit() {
   visualize('2-Opt', optTour, ID_OPT_TSP_TOUR_G, '#e0cf5c');
   visualize('Simulated Annealing', annealedTour, ID_SA_TSP_TOUR_G, '#79e095');
   visualize('Random', randTour, ID_RAND_TSP_TOUR_G, 'red');
+  visualize('Held-Karp', exactTour, ID_HK_TSP_TOUR_G, '#ffa154');
 }
 
 export const PathHandlers = {

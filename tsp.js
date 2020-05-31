@@ -1,6 +1,7 @@
 import dijkstra from "./dijkstra.js";
 import Point from "./tsp/Point.js";
 
+const DEBUG = 0;
 
 export function tourLength(Tour) {
   let length = 0;
@@ -332,21 +333,25 @@ export function heldKarp(clusters, start, end) {
    *
    * Change up clusters a bit: from Object to Array (ok.. a lot)
    */
-  clusters = Object.values(clusters).map(cluster => Object.values(cluster.points)[0]);
-  clusters.unshift(new Point(start, []));
-  clusters.push(new Point(end, []));
+  clusters = Object.values(clusters);
+  let cpoints = clusters.map(cluster => Object.values(cluster.points)[0]);
+  cpoints.unshift(new Point(start, []));
+  cpoints.push(new Point(end, []));
 
   const distance = (k, v) => {
-    let K = clusters[k];
-    let V = clusters[v];
+    let K = cpoints[k];
+    let V = cpoints[v];
 
     return K.distanceFrom(V.intersection).distance;
   }
 
   let M = {};
-  const memoize = (S, c, d) => {
+  const memoize = (S, c, d, next) => {
     let key = `(${S.join('-')})-${S[c]}`;
-    M[key] = d;
+    let obj = { d, next, S, c };
+    M[key] = obj;
+
+    return obj;
   }
 
   const get = (S, c) => {
@@ -363,7 +368,14 @@ export function heldKarp(clusters, start, end) {
    *
    * Returns shortest distance.
    */
-  const D = (S, c) => {
+  let id = 0;
+  const D = (S, c, depth) => {
+    let _id = id++;
+    const tabs = Array(depth).join('\t');
+    if (DEBUG) {
+      console.log(`${tabs}ID=${_id}: ${JSON.stringify(S)}, start @: ${S[c]}`);
+    }
+
     {
       let mem = get(S, c);
       if (mem !== undefined) {
@@ -373,25 +385,66 @@ export function heldKarp(clusters, start, end) {
 
     let min = Infinity;
     if (S.length === 1) {
-      min = distance(S[c], clusters.length-1);
-      memoize(S, c, min);
-      return min;
+      min = distance(S[c], cpoints.length-1);
+      return memoize(S, c, min, null);
     }
 
-    let S_ = S.filter((s, i) => c !== i);
+    let S_ = S.filter((s, i) => i !== c);
+    let xmin;
     let x;
     for (x=0; x<S_.length; x++) {
-      let d = D(S_, x) + distance(S_[x], S[c]);
+      let d = D(S_, x, depth+1).d + distance(S_[x], S[c]);
       if (d < min) {
         min = d;
+        xmin = x;
       }
     }
 
-    memoize(S, c, min);
-    return min;
+    let mem = memoize(S, c, min, S_[xmin]);
+    /*
+     * The next city to visit from S[c] in order to
+     * achieve the optimal tour: starting from S[c],
+     * then going through all cities in S, and finally
+     * ending at END, is: xmin
+     */
+    if (DEBUG) {
+      console.log(
+        `${tabs}ID=${_id}: ` +
+        `${S[c]} -> {${S.join(',')}}: ${S[c]} -> ${mem.next}. Distance=${mem.d}`
+      );
+    }
+    return mem;
   };
 
-  let _S = [...Array(clusters.length).keys()];
+  let _S = [...Array(cpoints.length).keys()];
   _S.pop();
-  return D(_S, 0);
+  D(_S, 0, 0);
+
+  // Construct solution
+  let Tour = [];
+  {
+    let paths = [];
+    let S = _S, c = 0;
+    while (c !== null) {
+      paths.push(c);
+
+      let mem = get(S, S.indexOf(c));
+
+      S = S.filter(s => s !== c);
+      c = mem.next;
+    }
+
+    Tour = paths.map(path => ({
+      cluster: path === 0 ? null : clusters[path-1],
+      point: cpoints[path]
+    }));
+
+    // add end
+    Tour.push( {
+      cluster: null,
+      point: cpoints[cpoints.length-1]
+    });
+  }
+
+  return Tour;
 }
